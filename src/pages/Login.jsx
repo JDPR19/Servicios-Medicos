@@ -1,12 +1,19 @@
 import {useState} from 'react';
 import '../index.css';
 import icon from '../components/icon';
+import { useNavigate } from 'react-router-dom';
 
 function Login () {
     const[showPassword, setShowPassword] = useState(false);
-    return (
+    const navigate = useNavigate();
 
+    const irHome = () => {
+        navigate('/admin')
+    };
+
+    return (
         <div className="loginContainer">
+            
             <div className="cartForm">
                     <h1 className="title"> 
                         Cuidarte Yutong
@@ -37,10 +44,11 @@ function Login () {
                         className='icon' />
                     </div>
                     <button 
-                    type="submit"
+                    type="button"
                     className="btn-estandar" 
                     title="Entrar" 
-                    alt="Boton Login" 
+                    alt="Boton Login"
+                    onClick={irHome} 
                     >
                         Iniciar Sesión
                     </button>
@@ -54,21 +62,11 @@ function Login () {
                     </button>
                 </form>
                     
-                
                 <footer className="footerCart">
-                    {/* <p>Gobierno Bolivariano de Venezuela &#x1F1FB;&#x1F1EA;</p> */}
                     <p>© 2025 Planta de Autobuses Yutong Venezuela &#x1F1FB;&#x1F1EA;</p>
-                    <p>Sistema de Información para la Gestion de Servicios Médicos Yutong</p>
+                    <p>Sistema de Gestión Integral de Servicios Médicos <hr />Rif: G-200172622</p>
                 </footer>
-            </div>
-            
-                        {/* <div>
-                            🧾 Nombre de la Aplicación
-            Cuidarte Yutong Sistema de Información para la Gestión de Consultas y Servicios Médicos en la Planta Yutong Venezuela
-            
-            🧠 Descripción General del Proyecto
-            Cuidarte Yutong es una plataforma digital diseñada para optimizar la atención médica de los trabajadores de la planta de autobuses Yutong en Venezuela. El sistema permite gestionar consultas médicas, historiales clínicos, servicios de enfermería, seguimiento de tratamientos y control de incapacidades, todo en un entorno seguro y eficiente.
-                        </div> */}
+            </div>           
         </div>
     );
 }

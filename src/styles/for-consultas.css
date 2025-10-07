@@ -1,0 +1,68 @@
+.forc-page{
+  display: grid;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--grey-tenue);
+  border-radius: 8px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.forc-title{
+  display: flex; align-items: center; gap: 10px;
+  color: var(--azul-texto); font-weight: 800; margin-bottom: 4px;
+}
+.forc-title-icon{ width: 28px; height: 28px; }
+
+.forc-section-title{
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; color: var(--azul-texto); margin-bottom: 10px;
+}
+.forc-section-title img{ width: 22px; height: 22px; }
+
+.forc-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.forc-grid.cols-1{ grid-template-columns: 1fr; }
+
+.fc-field{
+  display: grid; gap: 6px;
+  background: #fafafa;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 10px 12px; border-radius: 10px;
+}
+.fc-field label{ color: var(--black-four); font-weight: 700; }
+.fc-field input, .fc-field select, .fc-field textarea{
+  border: none; outline: none; background: transparent; width: 100%;
+  color: var(--black-thre); font-size: 1rem; resize: vertical;
+}
+
+.fc-input-icon{
+  display: flex; align-items: center; gap: 8px;
+  background: white; border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 8px; padding: 6px 8px;
+}
+.fc-input-icon img{ width: 18px; height: 18px; opacity: .75; }
+
+.forc-actions{
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin-top: 6px;
+}
+.forc-actions-right{ display: flex; gap: 8px; }
+
+.btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; border-radius: 10px; padding: 8px 14px; border: 1px solid transparent;
+  background: var(--grey-tenue); cursor: pointer; font-weight: 700;
+}
+.btn-primary{ background: var(--rojo); color: var(--white); }
+.btn-primary:hover{ background: var(--rojo-principal); }
+.btn-outline{ background: transparent; border-color: var(--azul-two); color: var(--azul-texto); }
+.btn-outline:hover{ background: #f5fbff; }
+.btn-secondary{ background: var(--azul-two); color: var(--azul-texto); }
+.btn-secondary:hover{ filter: brightness(0.98); }
+
+@media (max-width: 900px){
+  .forc-grid{ grid-template-columns: 1fr; }
+}

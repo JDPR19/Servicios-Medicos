@@ -24,8 +24,17 @@ import mascarilla2 from '../assets/mascarilla2.svg';
 import pulso from '../assets/pulso.svg';
 import pulso2 from '../assets/pulso2.svg';
 import user2 from '../assets/user2.svg';
+import user3 from '../assets/user3.svg';
+import monitorcardiaco from '../assets/monitorcardiaco.svg';
+import muela from '../assets/muela.svg';
+import campana from '../assets/campana.svg';
+import corazon from '../assets/corazon.svg';
+import consulta2 from '../assets/consulta2.svg';
+import consulta3 from '../assets/consulta.svg';
+import folder from '../assets/folder.svg';
 
 const icon = {
+    muela,
     llave,
     user,
     ojito,
@@ -50,7 +59,14 @@ const icon = {
     maletindoctor,
     maletindoctor2,
     mascarilla2,
-    mascarilla
+    mascarilla,
+    monitorcardiaco,
+    campana,
+    corazon,
+    user3,
+    consulta2,
+    consulta3,
+    folder
 };
 
 export default icon;

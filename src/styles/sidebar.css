@@ -1,0 +1,119 @@
+
+.sidebar-container {
+    display: flex;
+}
+
+
+.toggle-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: var(--azul-texto);
+    color: var(--white);
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background-color: var(--azul-texto);
+    color: var(--white);
+    padding: 2rem 1rem;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+.sidebar-container.open .sidebar {
+    width: 240px;
+}
+
+.sidebar-container.closed .sidebar {
+    width: 75px;
+}
+
+.sidebar-container.closed .sidebar-logo {
+    display: 0;
+    /* background-color: var(--azul-texto); */
+}
+.sidebar-container.closed .imgLogo {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;   
+}
+
+.sidebar-logo {
+    margin-bottom: 0;
+    text-align: center;
+    /* background-color: var(--grey-tenue); */
+    border-radius: 10px;
+}
+
+.imgLogo{
+    width: 80px;
+    height: 80px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.sidebar-links {
+    display: grid;
+    gap: 25px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+}
+
+.sidebar-links li {
+    margin: 0 0;
+}
+
+.sidebar-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease, padding-left 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.sidebar-links a:hover {
+    background-color: var(--azul-two);
+    padding-left: 0.7rem;
+    color: var(--azul-texto);
+}
+
+.link-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 0.5rem;
+}
+
+.separacion hr {
+    width: 100%;
+    background-color: aliceblue;
+    border-radius: 4px;
+    padding: 5px;
+    margin-bottom: 5px;
+}

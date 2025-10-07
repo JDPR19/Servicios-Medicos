@@ -1,0 +1,75 @@
+.consultas-page{
+  display: grid;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--grey-tenue);
+  border-radius: 8px;
+}
+
+/* Envoltorio filtros */
+.filters-wrap { margin-top: 10px; }
+
+/* Toolbar */
+.consultas-toolbar{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+.filters{
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.6fr 0.6fr;
+  gap: 10px;
+}
+.field{
+  display: flex; align-items: center; gap: 8px;
+  background: #fafafa;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 10px; border-radius: 10px;
+}
+.field label{ color: var(--grey); font-size: .9rem; }
+.field input[type="text"], .field input[type="date"], .field select{
+  border: none; outline: none; background: transparent; width: 100%;
+  font-family: 'Roboto', sans-serif; color: var(--black-thre);
+}
+.field-icon{ width: 18px; height: 18px; opacity: .7; }
+
+.actions{ display: flex; gap: 10px; align-items: center; }
+.btn{
+  display: inline-flex; align-items: center; gap: 8px;
+  border-radius: 10px; padding: 8px 12px; border: 1px solid transparent;
+  background: var(--grey-tenue); cursor: pointer; font-weight: 600;
+}
+.btn:disabled{ opacity: .6; cursor: not-allowed; }
+.btn-icon{ width: 18px; height: 18px; }
+.btn-primary{ background: var(--rojo); color: var(--white); }
+.btn-primary:hover{ background: var(--rojo-principal); }
+.btn-outline{ background: transparent; border-color: var(--azul-two); color: var(--azul-texto); }
+.btn-outline:hover{ background: #f5fbff; }
+.btn-secondary{ background: var(--azul-two); color: var(--azul-texto); }
+.btn-secondary:hover{ filter: brightness(0.98); }
+.btn-xs{ padding: 4px 8px; border-radius: 8px; font-size: .85rem; }
+.btn-outline.btn-xs{ border: 1px solid var(--azul-two); background: transparent; }
+
+.table-wrap{ background: var(--white); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); padding: 8px; }
+
+/* Badges */
+.badge{
+  display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: .85rem;
+  border: 1px solid rgba(0,0,0,0.06); background: #f5f5f5; color: #444;
+}
+.badge--warn{ background: #fff3cd; color: #7a5a00; border-color: #ffe69c; }
+.badge--info{ background: #e7f1ff; color: #0b4a91; border-color: #cfe2ff; }
+.badge--success{ background: #eaf7ea; color: #1f6d1f; border-color: #cfe8cf; }
+.badge--muted{ background: #f1f1f1; color: #666; }
+
+.row-actions{ display: flex; gap: 6px; }
+
+/* Responsive */
+@media (max-width: 1100px){
+  .filters{ grid-template-columns: 1fr 0.7fr 0.6fr 0.6fr; }
+}
+@media (max-width: 700px){
+  .consultas-toolbar{ grid-template-columns: 1fr; }
+  .filters{ grid-template-columns: 1fr; }
+}

@@ -1,0 +1,78 @@
+.navigate{
+  position: relative;
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-left: auto;
+  margin-right: 50px;
+  padding: 10px;
+}
+
+.bienvenida{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.bienvenida h1 {
+  font-family: 'pacifico', sans-serif;
+  color: var(--rojo-principal);
+}
+
+.navigate-options{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 30px;
+  left: 100px;
+}
+
+.btn-icon{
+  border: 1px solid transparent;
+  background-color: transparent;
+  border-radius: 50%;
+  padding: 5px;
+  transition: background 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.btn-icon:hover{
+  background: rgba(128, 128, 128, 0.233);
+  opacity: 0.8;
+}
+
+.apartado{
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--azul-texto);
+  font-family: 'Roboto', sans-serif;
+  background: var(--grey-opaco);
+  margin-top: 20px;
+  border-radius: 10px;
+  padding: 20px;
+  position: absolute;
+  top: 125px;
+}
+
+.apartado h1 {
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 2rem;
+  letter-spacing: 5px;
+}
+
+
+.imgNavigate{
+  width: 80px;
+  height: 80px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  position: relative;
+  overflow: hidden;
+}

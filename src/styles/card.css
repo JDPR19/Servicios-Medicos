@@ -1,0 +1,275 @@
+
+.card {
+    background: var(--azul-texto);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    max-width: 250px;
+    font-family: 'Roboto',sans-serif;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.card-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+  position: relative;
+  top: 80px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.number{
+  font-size: 3rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 20px;
+}
+
+.icon-card{
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+}
+
+
+/* InfoCard */
+.card h3 {
+    margin: 0 0 0.5rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.card p {
+    margin: 0;
+    color: var(--white);
+    font-size: 1.2rem;
+    padding: 10px 5px;
+}
+
+/* ProfileCard */
+.card-profile {
+    text-align: center;
+}
+
+.card-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+/* ServiceCard */
+.card-service {
+    text-align: center;
+}
+
+.card-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #0096c7;
+}
+
+.advanced-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 320px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.advanced-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
+
+/* Imagen */
+.card-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.advanced-card:hover .card-image img {
+    transform: scale(1.05);
+}
+
+/* Contenido */
+.card-content {
+    padding: 1rem;
+}
+
+.card-content h3 {
+    margin: 0 0 0.5rem;
+    color: #0077b6;
+    font-size: 1.3rem;
+}
+
+.card-description {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+/* Botón */
+.card-btn {
+    background: #0077b6;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.card-btn:hover {
+    background: #0096c7;
+}
+
+/* BlogCard estilo horizontal */
+.blog-card {
+    display: flex;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 700px;
+    cursor: pointer;
+}
+
+.blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
+
+/* Imagen lateral */
+.blog-card-image {
+    flex: 1;
+    overflow: hidden;
+}
+
+.blog-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.blog-card:hover .blog-card-image img {
+    transform: scale(1.05);
+}
+
+/* Contenido */
+.blog-card-content {
+    flex: 2;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.blog-card-date {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+.blog-card-content h3 {
+    margin: 0 0 0.5rem;
+    color: #0077b6;
+    font-size: 1.4rem;
+}
+
+.blog-card-description {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.blog-card-text {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+/* GridCard estilo vertical */
+.grid-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.grid-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Imagen */
+.grid-card-image img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.grid-card:hover .grid-card-image img {
+    transform: scale(1.05);
+}
+
+/* Contenido */
+.grid-card-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.grid-card-content h3 {
+    margin: 0 0 0.5rem;
+    color: #0077b6;
+    font-size: 1.2rem;
+}
+
+.grid-card-content p {
+    flex-grow: 1;
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
