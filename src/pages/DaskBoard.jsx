@@ -37,6 +37,12 @@ function DashboardPage() {
             <span className='number'>1</span>
             <h3>Consultas Totales</h3>
           </Card>
+
+          <Card color='#0B3A6A'>
+            <img src={icon.maletindoctor3} alt="icon-card" className='icon-card'/>
+            <span className='number'>1</span>
+            <h3>En Inventario</h3>
+          </Card>
           
       </section>
       
@@ -45,19 +51,19 @@ function DashboardPage() {
           <h3 className="section-title">Acciones rápidas</h3>
           <div className="qa-grid">
             <button className="qa-card" onClick={() => navigate('/admin/pacientes/nuevo')}>
-              <img src={icon.user3} alt="" className="qa-icon" />
+              <img src={icon.user2} alt="" className="icon" />
               <span>Registrar paciente</span>
             </button>
             <button className="qa-card" onClick={() => navigate('/admin/consulta/nueva')}>
-              <img src={icon.consultabien} alt="" className="qa-icon" />
+              <img src={icon.carpetaplus} alt="" className="icon" />
               <span>Nueva consulta</span>
             </button>
             <button className="qa-card" onClick={() => navigate('/admin/reposos/nuevo')}>
-              <img src={icon.candado2} alt="" className="qa-icon" />
+              <img src={icon.muela} alt="" className="icon" />
               <span>Registrar reposo</span>
             </button>
             <button className="qa-card" onClick={() => navigate('/admin/medicamentos/cargar')}>
-              <img src={icon.maletindoctor2} alt="" className="qa-icon" />
+              <img src={icon.maletindoctor2} alt="" className="icon" />
               <span>Cargar medicamento</span>
             </button>
           </div>
@@ -88,13 +94,7 @@ function DashboardPage() {
             <h3 className="panel-title">Consultas por semana</h3>
             <div className="chart-placeholder">Gráfico aquí</div>
           </div>
-
-          <div className="panel">
-            <h3 className="panel-title">Alertas</h3>
-            <InfoCard>
-              {/* Aquí puedes mapear alertas reales */}
-            </InfoCard>
-          </div>
+          
         </section>
       </main>
     

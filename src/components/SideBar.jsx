@@ -12,12 +12,12 @@ function Sidebar() {
     };
 
     const links = [
-        { to: '/', label: 'Home', icon: icon.corazon},
-        { to: '/pacientes', label: 'Pacientes', icon: icon.user3},
-        { to: '/consultas', label: 'Consultas', icon: icon.consulta3 },
-        { to: '/historias', label: 'Historias', icon: icon.folder },
-        { to: '/reposos', label: 'Reposos', icon: icon.mascarilla },
-        {to: '/administrador', label: 'Administrador', icon: icon.admin},
+        { to: '/admin', label: 'Home', icon: icon.corazon},
+        { to: '/Pacientes', label: 'Pacientes', icon: icon.user3},
+        { to: '/admin/Consultas', label: 'Consultas', icon: icon.consulta3 },
+        { to: '/Historias', label: 'Historias', icon: icon.folder },
+        { to: '/Reposos', label: 'Reposos', icon: icon.mascarilla },
+        {to: '/Administrador', label: 'Administrador', icon: icon.admin},
     ];
 
     return (
@@ -35,7 +35,7 @@ function Sidebar() {
                 <div className='separacion'>
                     <hr />
                 </div>
-               <ul className="sidebar-links">
+            <ul className="sidebar-links">
                 {links.map((link, index) => (
                     <li key={index}>
                     <Link to={link.to}>

@@ -5,6 +5,10 @@ import Landing from "./pages/landing.jsx";
 import Login from "./pages/Login.jsx";
 ////////////////////////// PANTALLAS PRIVADAS //////////////////////////
 import DaskBoard from './pages/DaskBoard.jsx';
+import Consultas from './pages/Consultas.jsx';
+
+////////////////////////// PANTALLAS FORMULARIOS ////////////////
+import ForConsultas from './Formularios/ForConsultas'; 
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
 import Header from "./components/header.jsx";
@@ -38,6 +42,8 @@ function App() {
           {/* RUTAS PRIVADAS */}
             <Route path='/admin' element={<MainLayout/>}>
               <Route index element={<DaskBoard/>} />
+              <Route path='Consultas' element={<Consultas/>} />
+              <Route path='ForConsultas' element={<ForConsultas/>} />
 
             </Route>
 

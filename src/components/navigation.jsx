@@ -7,6 +7,7 @@ function Header() {
 
     const routeToTitle = {
         '/admin' : 'Servicios Médicos',
+        '/admin/Consultas' : 'Consultas',
     };
 
     const Pantalla = routeToTitle[location.pathname || 'Cuidarte Yutong'];

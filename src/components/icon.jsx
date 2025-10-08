@@ -32,6 +32,7 @@ import corazon from '../assets/corazon.svg';
 import consulta2 from '../assets/consulta2.svg';
 import consulta3 from '../assets/consulta.svg';
 import folder from '../assets/folder.svg';
+import maletindoctor3 from '../assets/maletindoctor3.svg';
 
 const icon = {
     muela,
@@ -66,7 +67,8 @@ const icon = {
     user3,
     consulta2,
     consulta3,
-    folder
+    folder,
+    maletindoctor3,
 };
 
 export default icon;
