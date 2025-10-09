@@ -133,17 +133,41 @@ function Landing() {
 
         <footer className="landingFooter" id="contacto">
           <div className="container footerInner">
-            <p>© 2025 Planta de Autobuses Yutong Venezuela &#x1F1FB;&#x1F1EA;</p>
-            <p>Rif: G-200172622</p>
-            <section className="dev-BadDev">
-              <a href="baddevprograming@gmail.com" className="footerMail">BadDevPrograming@Gmail.com</a>
-            </section>
-            <nav className="footerNav">
-              <a href="#inicio">Inicio</a>
-              <a href="#caracteristicas">Características</a>
-              <a href="#servicios">Servicios</a>
-            </nav>
-            <a href="oticyutong@gmail.com" className="footerMail">oticyutong@gmail.com</a>
+              {/* Columna izquierda: marca */}
+              <div className="footerBrand">
+                <p>© 2025 Planta de Autobuses Yutong Venezuela &#x1F1FB;&#x1F1EA;</p>
+                <p>Rif: G-200172622</p>
+              </div>
+
+              {/* Columna central: dev-BadDev (íconos + email con ícono) */}
+              <section className="dev-BadDev">
+                <div className="dev-icons">
+                  <a href="#" className="dev-icon" title="Icono 1">
+                    <img src={icon.monitorcardiaco} alt="icono" />
+                  </a>
+                  <a href="#" className="dev-icon" title="Icono 2">
+                    <img src={icon.estetoscopio} alt="icono" />
+                  </a>
+                  <a href="#" className="dev-icon" title="Icono 3">
+                    <img src={icon.maletindoctor2} alt="icono" />
+                  </a>
+                </div>
+
+                <a href="mailto:baddevprograming@gmail.com" className="dev-mail" title="Correo de contacto">
+                  <img src={icon.link} alt="" className="dev-mailIcon" />
+                  BadDevPrograming@Gmail.com
+                </a>
+              </section>
+
+              {/* Columna derecha: navegación y correo general */}
+              <div className="footerRight">
+                <nav className="footerNav">
+                  <a href="#inicio">Inicio</a>
+                  <a href="#caracteristicas">Características</a>
+                  <a href="#servicios">Servicios</a>
+                </nav>
+                <a href="mailto:oticyutong@gmail.com" className="footerMail">oticyutong@gmail.com</a>
+              </div>
           </div>
         </footer>
     </div>

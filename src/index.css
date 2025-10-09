@@ -39,7 +39,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
+  /* padding: 24px; */
   background-image: url('./images/fondo3.jpg');
   background-repeat: no-repeat;
   background-size: cover;
@@ -68,13 +69,16 @@
 }
 
 .cartForm{
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: stretch;
   justify-content: center;
   flex-direction: column;
   flex-wrap: wrap;
-  width: fit-content;
-  height: 70vh;
+  width: min(480px, 92%);
+  min-height: clamp(560px, 70vh, 720px);
+  min-height: 70vh;
+  gap: 16px;
   padding: 20px;
   margin-right: auto;
   margin-left: auto;
@@ -95,51 +99,64 @@
 } */
 
 .title{
-  position: relative;
-  bottom: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  gap: 10px;
+  white-space: nowrap;
   font-size: 2rem;
   font-family: 'Pacifico', sans-serif;
   font-weight: 400;
   color: var(--rojo-principal);
-  margin-bottom: 30px;
   padding: 10px;
 }
 
 .title img {
+  display: block;
   width: 50px;
   height: 50px;
-  margin-left: 20px;
-  top: 15px;
+  flex: 0 0 auto;
 }
 
 .formLogin {
   flex-direction: column;
   display: flex;
-  align-items: left;
-  justify-content: center;
-  width: fit-content;
-  height: 300px;
-  width: 70%;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex: 1 1 auto;
+  width: 100%;
   border-radius: 10px;
   font-family: 'Roboto', sans-serif;
-  position: relative;
-  bottom: 50px ;
-  gap: 15px;
-  margin-top: 10px;
+  position: static;
+  gap: 20px;
+  margin-top: 25px;
 }
 
 .infoLabels {
-  font-size: 1.2rem;  
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
   color: var(--azul-atenuado);
   cursor: pointer;
   width: 100%;
+  margin-top: 2px;
+  margin-left: 10px;
+}
+
+.infoLabels label{
+  display: flex;                  
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  cursor: pointer;
 }
 
 .infoLabels img{
+  display: block;
   width: 20px;
-  top: 8px;
-  margin-right: 10px;
+  height: 20px;
+  margin: 0;
   cursor: pointer;
 }
 
@@ -182,11 +199,11 @@
 }
 
 .icon {
-  display: flex;
+  /* display: flex; */
   width: 30px;
   height: 30px;
   cursor: pointer;
-  position: relative;
+  /* position: relative; */
 }
 
 .btn-estandar{
@@ -208,6 +225,10 @@
 }
 
 .btn-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;        
+  gap: 8px;
   width: 100%;
   border: none;
   background: transparent;
@@ -215,21 +236,26 @@
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 550;
-  font-family: 'Robot', sans-serif;
+  font-family: 'Roboto', sans-serif; 
+  padding: 6px 0;
 }
 
 .btn-link img{
+  display: block;
   width: 18px;
-  top: 10px;
-  margin-right: 10px;
+  height: 18px;
+  margin: 0 8px 0 0;
 }
 
 .footerCart{
-  bottom: 0;
   text-align: center;
   color: var(--grey);
   font-size: 0.9rem;
-  /* margin-bottom: 5px; */
+  width: 100%;
+  margin-top: auto;
+  padding-top: 8px;
+  place-self: end stretch;
+  margin-bottom: 20px;
 }
 
 .footerCart p {
@@ -507,14 +533,62 @@ html { scroll-behavior: smooth; }
 }
 .footerInner{
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   gap: 12px;
 }
+
 .footerNav{ display: flex; gap: 14px; }
 .footerNav a{ color: var(--grey-one); text-decoration: none; }
 .footerNav a:hover{ color: var(--white); }
 .footerMail{ color: var(--yellow-principal); text-decoration: none; }
+
+.footerBrand{
+  display: grid;
+  gap: 4px;
+}
+
+.dev-BadDev{
+  display: grid;
+  justify-items: center; 
+  gap: 10px;
+}
+
+.dev-mail{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--yellow-principal);   /* consistente con .footerMail */
+  text-decoration: none;
+  font-weight: 600;
+}
+.dev-mail:hover{ text-decoration: underline; }
+.dev-mailIcon{ width: 16px; height: 16px; }
+
+.footerRight{
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.dev-icons{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dev-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: background .2s ease, transform .12s ease;
+}
 
 /* Reuso y ajustes */
 .btn-estandar{

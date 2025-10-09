@@ -16,8 +16,8 @@ function Login () {
             
             <div className="cartForm">
                     <h1 className="title"> 
-                        Cuidarte Yutong
                         <img src={icon.pulso2} alt="corazon" title='Servicios Medicos Yutong' className='icon'/>
+                        Cuidarte Yutong
                     </h1>
                 <form className="formLogin">
                     <div className='infoLabels'>
@@ -64,7 +64,7 @@ function Login () {
                     
                 <footer className="footerCart">
                     <p>© 2025 Planta de Autobuses Yutong Venezuela &#x1F1FB;&#x1F1EA;</p>
-                    <p>Sistema de Gestión Integral de Servicios Médicos <hr />Rif: G-200172622</p>
+                    {/* <p>Sistema de Gestión Integral de Servicios Médicos</p> */}
                 </footer>
             </div>           
         </div>
