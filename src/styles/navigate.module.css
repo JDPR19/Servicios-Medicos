@@ -2,7 +2,7 @@
 .navigate {
   position: sticky;
   top: 0;
-  z-index: 11200;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -33,9 +33,7 @@
   font-family: 'Pacifico', sans-serif;
   font-size: 1.35rem;
   color: var(--rojo-principal);
-  /* transition: transform .18s ease; */
 }
-/* .bienvenida h1:hover { transform: translateY(-3px); } */
 
 /* acciones (derecha) */
 .navigate-options {
@@ -54,9 +52,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-   border: none;  
+  border: none;  
   background: rgba(255,255,255,0.6);
-  /* border: 1px solid rgba(0,0,0,0.04); */
   transition: transform .14s ease, background .14s ease;
   cursor: pointer;
   padding: 6px;
@@ -113,5 +110,5 @@
   .bienvenida h1 { font-size: 1.05rem; }
   .navigate-options { gap: 10px; }
   .btn-icon { width: 38px; height: 38px; }
-  .apartado { display: none; } /* ocultar pill en móviles pequeños para ahorrar espacio */
+  .apartado { display: none; }
 }

@@ -46,7 +46,7 @@ const closeConfirmDelete = () => {
 };
 
 const handleNuevo = () => {
-    setEditDoctor(null);
+    setEditDoctor();
     setModalOpen(true);
   };
 
@@ -83,7 +83,9 @@ const handleExportExcel = () => {
   exportToExcel({
     data: filtered,
     columns: exportColumns,
-    fileName: "doctores.xlsx"
+    fileName: "doctores.xlsx",
+    count: true, 
+    totalLabel: "TOTAL DE REGISTROS"
   });
 };
 //////////////////////////////////////////----Llamada de los datos al montar el componente ----/////////////////////////////////////////////////////////////////////////////// 
@@ -109,13 +111,11 @@ const fetchDoctores = async () => {
   };
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
   
-  //////////-------------------- Manejador de edicion por id ----------------------------------///////////////
+  //////////-------------------- Manejador de vista por id ----------------------------------///////////////
 const handleView = async (row) => {
   setLoading(true);
   try {
-    const token = (localStorage.getItem('token') || '').trim();
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await axios.get(`${BaseUrl}doctores/ver/${row.id}`, { headers });
+    const res = await axios.get(`${BaseUrl}doctores/ver/${row.id}`, { headers: getAuthHeaders() });
     setDoctorToShow(res.data);
   } catch (error) {
     console.error('error Al mostrar datos por id de doctor', error);
@@ -181,8 +181,9 @@ const columns = [
     header: "Acciones",
     render: (row) => (
       <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-        <button className="btn btn-xs" onClick={() => handleView(row)} title="Ver">Ver</button>
-        <button className="btn btn-xs btn-warn" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+        <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+        <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+        <button className="btn btn-xs btn-outline btn-print">Imprimir</button>
         <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
       </div>
     )
@@ -194,19 +195,17 @@ const exportColumns = columns.filter(col => !col.render);
   return (
     <div className="pac-page">
       {loading && (
-        <div style={{ display: 'flex', justifyContent: 'center', margin: 12 }}>
-          <Spinner size={40} label="Cargando doctores..." />
+        <div className="spinner-overlay">
+          <Spinner size={50} label="Cargando doctores..." />
         </div>
       )}
 
       <InfoModal
-        isOpen={!!doctorToShow || loading}
+        isOpen={!!doctorToShow}
         onClose={() => setDoctorToShow(null)}
         title="Información del Doctor"
       >
-        {loading ? (
-          <Spinner size={32} label="Cargando información..." />
-        ) : doctorToShow && (
+        {doctorToShow && (
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li><b>Cédula:</b> {doctorToShow.cedula}</li>
             <li><b>Nombre:</b> {doctorToShow.nombre} {doctorToShow.apellido}</li>
@@ -222,8 +221,8 @@ const exportColumns = columns.filter(col => !col.render);
         isOpen={confirmModal}
         onClose={closeConfirmDelete}
         onConfirm={() => {
-          handleDelete(selectedDoctor);
-          closeConfirmDelete();
+        handleDelete(selectedDoctor);
+        closeConfirmDelete();
         }}
         title="¿Confirmación de Eliminación?"
         message="¿Estás seguro de eliminar este registro?"
@@ -265,6 +264,7 @@ const exportColumns = columns.filter(col => !col.render);
               href={pdfUrl}
               download="doctores.pdf"
               className="btn btn-primary"
+              style={{ textDecoration: "none" }}
             >
               Descargar PDF
             </a>
@@ -280,7 +280,7 @@ const exportColumns = columns.filter(col => !col.render);
         <Card color="#0B3A6A" title="Activos">
           <img src={icon.escudobien} alt="" className="icon-card" />
           <span className="number">{stats.activos}</span>
-          <h3>Doctoes Activos</h3>
+          <h3>Doctores Activos</h3>
         </Card>
         <Card color="#CE1126" title="Inactivos">
           <img src={icon.mascarilla} alt="" className="icon-card" />
@@ -316,8 +316,8 @@ const exportColumns = columns.filter(col => !col.render);
           </div>
 
           <div className="actions">
-            <button className="btn btn-secondary" onClick={handlePreviewPDF}>
-              <img src={icon.impresora} className="btn-icon" alt="" /> Previsualizar PDF
+            <button className="btn btn-secondary " onClick={handlePreviewPDF}>
+              <img src={icon.impresora} className="btn-icon" alt="" /> PDF
             </button>
             <button className="btn btn-secondary" onClick={handleExportExcel}>
               <img src={icon.impresora} className="btn-icon" alt="" /> Excel

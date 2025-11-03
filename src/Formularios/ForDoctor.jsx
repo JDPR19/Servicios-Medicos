@@ -6,10 +6,25 @@ import { BaseUrl } from "../utils/Constans";
 import { validateField, validationRules } from "../utils/validation";
 import Spinner from "../components/spinner";
 import { useToast } from "../components/userToasd";
+import SingleSelect from "../components/SingleSelect";
+
+
+    const PREFIJOS = [
+    { value: "V-", label: "V-" },
+    { value: "E-", label: "E-" },
+    { value: "J-", label: "J-" },
+    { value: "G-", label: "G-" },
+    ];
 
 function ForDoctor({ initialData = {}, onSave, onClose }) {
 const showToast = useToast();
 const isEdit = !!initialData?.id;
+
+ // Extraer prefijo y número de cédula inicial
+const getPrefijo = cedula =>
+    PREFIJOS.find(p => cedula?.startsWith(p.value))?.value || "V-";
+const getNumero = cedula =>
+    cedula ? cedula.replace(/^(V-|E-|J-|G-)/, "") : "";
 
 const initialForm = {
 cedula: "",
@@ -23,10 +38,15 @@ estado: true,
 };
 
 const [form, setForm] = useState(initialForm);
+const [prefijoCedula, setPrefijoCedula] = useState(getPrefijo(initialForm.cedula));
+const [numeroCedula, setNumeroCedula] = useState(getNumero(initialForm.cedula));
 const [errors, setErrors] = useState({});
 const [cargos, setCargos] = useState([]);
 const [profesiones, setProfesiones] = useState([]);
 const [loading, setLoading] = useState(false);
+
+
+
 
 // Cargar catálogos
 useEffect(() => {
@@ -47,11 +67,15 @@ try {
     setLoading(false);
 }
 };
+
 fetchCatalogos();
 }, []);
 
 useEffect(() => {
-setForm({ ...initialForm, ...initialData });
+    const cedula = initialData?.cedula || "";
+    setForm({ ...initialForm, ...initialData });
+    setPrefijoCedula(getPrefijo(cedula));
+    setNumeroCedula(getNumero(cedula));
 }, []);
 
 // Validación de campos
@@ -76,91 +100,138 @@ setErrors((prev) => ({
 }));
 };
 
+const handlePrefijoChange = opt => {
+    const nuevoPrefijo = opt ? opt.value : "V-";
+    setPrefijoCedula(nuevoPrefijo);
+    setForm(f => ({ ...f, cedula: nuevoPrefijo + numeroCedula }));
+};
+const handleNumeroCedulaChange = e => {
+    const numero = e.target.value.replace(/\D/g, "");
+    setNumeroCedula(numero);
+    setForm(f => ({ ...f, cedula: prefijoCedula + numero }));
+};
+
 // Validar todo antes de guardar
 const validateAll = () => {
-const newErrors = {};
-Object.keys(form).forEach((field) => {
+    const newErrors = {};
+    Object.keys(form).forEach((field) => {
     if (field === "estado") return;
     const err = validate(field, form[field]);
     if (err) newErrors[field] = err;
-});
-setErrors(newErrors);
-return Object.keys(newErrors).length === 0;
-};
-
-// Guardar doctor (POST o PUT)
-const handleSave = async (e) => {
-e.preventDefault();
-if (!validateAll()) {
-    showToast?.("Corrige los errores antes de guardar", "warning");
-    return;
-}
-setLoading(true);
-try {
-    const token = (localStorage.getItem('token') || '').trim();
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    let res;
-    if (isEdit) {
-    res = await axios.put(`${BaseUrl}doctores/actualizar/${initialData.id}`, form, { headers });
-    } else {
-    res = await axios.post(`${BaseUrl}doctores/registrar`, form, { headers });
-    }
-    showToast?.(isEdit ? "Doctor actualizado correctamente" : "Doctor registrado correctamente", "success");
-    if (onSave) onSave(res.data);
-    if (onClose) onClose();
-} catch (err) {
-    const msg = err?.response?.data?.message || "Error guardando doctor";
-    showToast?.(msg, "error");
-} finally {
-    setLoading(false);
-}
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
 };
 
 const handleClear = () => {
-setForm(initialForm);
-setErrors({});
+    setForm(initialForm);
+    setErrors({});
+    setPrefijoCedula(getPrefijo(initialForm.cedula));
+    setNumeroCedula(getNumero(initialForm.cedula));
 };
 
+// ////////////////////////////////////////////////////////////////////////////////////
+
+// Función para registrar un nuevo doctor
+const handleRegister = async (e) => {
+e.preventDefault();
+if (!validateAll()) {
+showToast?.("Corrige los errores antes de guardar", "warning");
+return;
+}
+setLoading(true);
+try {
+const token = (localStorage.getItem('token') || '').trim();
+const headers = token ? { Authorization: `Bearer ${token}` } : {};
+const res = await axios.post(`${BaseUrl}doctores/registrar`, form, { headers });
+showToast?.("Doctor registrado correctamente", "success");
+if (onSave) onSave(res.data);
+if (onClose) onClose();
+} catch (err) {
+const msg = err?.response?.data?.message || "Error registrando doctor";
+showToast?.(msg, "error");
+} finally {
+setLoading(false);
+}
+};
+
+// Función para editar un doctor existente
+const handleEdit = async (e) => {
+e.preventDefault();
+if (!validateAll()) {
+showToast?.("Corrige los errores antes de guardar", "warning");
+return;
+}
+setLoading(true);
+try {
+const token = (localStorage.getItem('token') || '').trim();
+const headers = token ? { Authorization: `Bearer ${token}` } : {};
+const res = await axios.put(`${BaseUrl}doctores/actualizar/${initialData.id}`, form, { headers });
+showToast?.("Doctor actualizado correctamente", "success");
+if (onSave) onSave(res.data);
+if (onClose) onClose();
+} catch (err) {
+const msg = err?.response?.data?.message || "Error actualizando doctor";
+showToast?.(msg, "error");
+} finally {
+setLoading(false);
+}
+};
+
+
+
 return (
-<form className="forc-page" onSubmit={handleSave}>
+<form  onSubmit={isEdit ? handleEdit : handleRegister}>
     <div className="forc-section-title">
-    <img src={icon.user3 || icon.user} alt="" />
-    <span>{isEdit ? "Editar Doctor" : "Registro de Doctor"}</span>
     </div>
     <div className="forc-grid">
     <div className="fc-field">
-        <label>Cédula</label>
-        <input
-        name="cedula"
-        value={form.cedula}
-        onChange={handleChange}
-        placeholder="Ej: V-12345678"
-        required
-        />
+        <label><span className="unique">*</span>Cédula</label>
+        <div style={{ display: "flex", gap: 8 }}>
+            <SingleSelect
+            options={PREFIJOS}
+            value={PREFIJOS.find(p => p.value === prefijoCedula)}
+            onChange={handlePrefijoChange}
+            placeholder="Prefijo"
+            isClearable={false}
+            />
+            <input
+            name="cedula"
+            value={numeroCedula}
+            onChange={handleNumeroCedulaChange}
+            placeholder="12345678"
+            required
+            style={{ flex: 1 }}
+            maxLength={10}
+            pattern="\d*"
+            />
+        </div>
         {errors.cedula && <span style={{ color: "red" }}>{errors.cedula}</span>}
     </div>
     <div className="fc-field">
-        <label>Nombre</label>
+        <label><span className="unique">*</span>Nombre</label>
         <input
         name="nombre"
         value={form.nombre}
         onChange={handleChange}
+        placeholder="Ej: Pedro"
         required
         />
         {errors.nombre && <span style={{ color: "red" }}>{errors.nombre}</span>}
     </div>
     <div className="fc-field">
-        <label>Apellido</label>
+        <label><span className="unique">*</span>Apellido</label>
         <input
         name="apellido"
         value={form.apellido}
         onChange={handleChange}
+        placeholder="Ej: Colmenarez"
         required
         />
         {errors.apellido && <span style={{ color: "red" }}>{errors.apellido}</span>}
     </div>
     <div className="fc-field">
-        <label>Contacto</label>
+        <label><span className="unique">*</span>Contacto</label>
         <input
         name="contacto"
         value={form.contacto}
@@ -171,58 +242,39 @@ return (
         {errors.contacto && <span style={{ color: "red" }}>{errors.contacto}</span>}
     </div>
     <div className="fc-field">
-        <label>Cargo</label>
-        <select
-        name="cargos_id"
-        value={form.cargos_id}
-        onChange={handleChange}
-        required
-        >
-        <option value="">Seleccione…</option>
-        {cargos.map((c) => (
-            <option key={c.id} value={c.id}>{c.nombre}</option>
-        ))}
-        </select>
-    </div>
-    <div className="fc-field">
-        <label>Profesión</label>
-        <select
-        name="profesion_id"
-        value={form.profesion_id}
-        onChange={handleChange}
-        required
-        >
-        <option value="">Seleccione…</option>
-        {profesiones.map((p) => (
-            <option key={p.id} value={p.id}>{p.carrera}</option>
-        ))}
-        </select>
-    </div>
-    <div className="fc-field">
-        <label>
-        <input
-            type="checkbox"
-            name="estado"
-            checked={form.estado}
-            onChange={handleChange}
+        <label><span className="unique">*</span>Cargo</label>
+        <SingleSelect
+            options={cargos.map(c => ({ value: c.id, label: c.nombre }))}
+            value={cargos.find(c => c.id === form.cargos_id) ? { value: form.cargos_id, label: cargos.find(c => c.id === form.cargos_id)?.nombre } : null}
+            onChange={opt => setForm(f => ({ ...f, cargos_id: opt ? opt.value : "" }))}
+            placeholder="Seleccione…"
+            isClearable={false}
         />
-        Activo
-        </label>
+    </div>
+    <div className="fc-field">
+        <label><span className="unique">*</span>Profesión</label>
+        <SingleSelect
+            options={profesiones.map(p => ({ value: p.id, label: p.carrera }))}
+            value={profesiones.find(p => p.id === form.profesion_id) ? { value: form.profesion_id, label: profesiones.find(p => p.id === form.profesion_id)?.carrera } : null}
+            onChange={opt => setForm(f => ({ ...f, profesion_id: opt ? opt.value : "" }))}
+            placeholder="Seleccione…"
+            isClearable={false}
+        />
     </div>
     </div>
 
-    <div className="forc-actions">
-    <button className="btn btn-outline" type="button" onClick={onClose}>
-        Cancelar
-    </button>
-    <div className="forc-actions-right">
-        <button className="btn btn-secondary" type="button" onClick={handleClear}>
-        Limpiar
+    <div className="forc-actions" style={{marginTop:30, marginBottom:20}}>
+        <button className="btn btn-outline" type="button" onClick={onClose}>
+            Cancelar
         </button>
-        <button className="btn btn-primary" type="submit" disabled={loading}>
-        {loading ? <Spinner size={18} inline label="Guardando..." /> : "Guardar"}
-        </button>
-    </div>
+        <div className="forc-actions-right">
+            <button className="btn btn-secondary" type="button" onClick={handleClear}>
+            Limpiar
+            </button>
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+                {loading ? <Spinner size={10} inline label="Procesando..." /> : "Guardar"}
+            </button>
+        </div>
     </div>
 </form>
 );
