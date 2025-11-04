@@ -20,6 +20,30 @@
     margin-top: 50px;
 }
 
+.modal-content2 {
+    background: #fff;
+    border-radius: 8px;
+    width: 100%; 
+    max-width: 500px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation-duration: 0.4s;
+    animation-fill-mode: both;
+    margin-top: 50px;
+}
+
+.modal-content3{
+    background: #fff;
+    border-radius: 8px;
+    width: 100%;
+    height: auto; 
+    max-width: 400px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation-duration: 0.4s;
+    animation-fill-mode: both;
+    margin-top: 50px;
+}
 /* Fullscreen modal */
 .modal-overlay.fullscreen {
     background: rgba(0,0,0,0.7);

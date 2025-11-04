@@ -14,7 +14,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
 import ForDoctor from "../Formularios/ForDoctor";
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
-
+import SingleSelect from "../components/SingleSelect";
 
 function Doctores() {
   // const navigate = useNavigate();
@@ -88,6 +88,12 @@ const handleExportExcel = () => {
     totalLabel: "TOTAL DE REGISTROS"
   });
 };
+
+const estadoOptions = [
+  { value: "todos", label: "Estado" },
+  { value: "activo", label: "Activo" },
+  { value: "inactivo", label: "Inactivo" }
+];
 //////////////////////////////////////////----Llamada de los datos al montar el componente ----/////////////////////////////////////////////////////////////////////////////// 
 const fetchDoctores = async () => {
     setLoading(true);
@@ -171,12 +177,25 @@ const filtered = useMemo(() => {                 // ← aplicar filtros realment
 
 
 const columns = [
+  {
+    header: "N°",
+    key: "orden",
+    render: (_row, idx) => idx + 1
+  },
   { accessor: "cedula", header: "Cédula", key: "cedula" },
   { accessor: "apellido", header: "Apellido", key: "apellido" },
   { accessor: "nombre", header: "Nombre", key: "nombre" },
-  { accessor: "profesion_carrera", header: "Profesión", key: "profesion_carrera" },
-  { accessor: "cargo_nombre", header: "Cargo", key: "cargo_nombre" },
+  // { accessor: "profesion_carrera", header: "Profesión", key: "profesion_carrera" },
+  // { accessor: "cargo_nombre", header: "Cargo", key: "cargo_nombre" },
   { accessor: "contacto", header: "Contacto", key: "contacto" },
+  {
+    header: "Estado",
+    key: "estado",
+    render: (row) =>
+      row.estado === true || row.estado === "activo"
+        ? <span className="btn btn-xs badge--success">Activo</span>
+        : <span className="btn btn-xs badge--muted">Inactivo</span>
+  },
   {
     header: "Acciones",
     render: (row) => (
@@ -190,7 +209,27 @@ const columns = [
   },
 ];
 
-const exportColumns = columns.filter(col => !col.render);
+const exportColumns = [
+  {
+    header: "N°",
+    key: "orden",
+    render: (_row, idx) => idx + 1
+  },
+  { header: "Cédula", key: "cedula" },
+  { header: "Apellido", key: "apellido" },
+  { header: "Nombre", key: "nombre" },
+  { header: "Profesión", key: "profesion_carrera" },
+  { header: "Cargo", key: "cargo_nombre" },
+  { header: "Contacto", key: "contacto" },
+  {
+    header: "Estado",
+    key: "estado",
+    render: row =>
+      row.estado === true || row.estado === "activo"
+        ? "Activo"
+        : "Inactivo"
+  }
+];
 
   return (
     <div className="pac-page">
@@ -287,11 +326,11 @@ const exportColumns = columns.filter(col => !col.render);
           <span className="number">{stats.inactivos}</span>
           <h3>Doctores Inactivos</h3>
         </Card>
-        <Card color="#FCD116" title="Atenciones este mes">
+        {/* <Card color="#FCD116" title="Atenciones este mes">
           <img src={icon.user5} alt="" className="icon-card" />
           <span className="number">{stats.thisMonth}</span>
           <h3>Atenciones (Mes)</h3>
-        </Card>
+        </Card> */}
       </section>
 
       <section className="quick-actions2">
@@ -306,24 +345,28 @@ const exportColumns = columns.filter(col => !col.render);
                 onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
               />
             </div>
-            <div className="field">
-              <select value={filters.estado} onChange={e => setFilters(f => ({ ...f, estado: e.target.value }))}>
-                <option value="todos">Estado</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
+            <div>
+                <SingleSelect
+                  options={estadoOptions}
+                  value={estadoOptions.find(opt => opt.value === filters.estado)}
+                  onChange={opt =>
+                    setFilters(f => ({ ...f, estado: opt ? opt.value : "todos" }))
+                  }
+                  isClearable={false}
+                  placeholder="Estado"
+                />
             </div>
           </div>
 
           <div className="actions">
             <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.impresora} className="btn-icon" alt="" /> PDF
+              <img src={icon.impresora2} className="btn-icon" alt="PDF" style={{marginRight:5}}/> PDF
             </button>
             <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.impresora} className="btn-icon" alt="" /> Excel
+              <img src={icon.impresora2} className="btn-icon" alt="EXCEL" style={{marginRight:5}} /> Excel
             </button>
           <button className="btn btn-primary" onClick={handleNuevo}>
-            <img src={icon.user5} className="btn-icon" alt="" /> Nuevo Doctor
+            <img src={icon.user5} className="btn-icon" alt="" style={{marginRight:5}}/> Nuevo Doctor
           </button>
           </div>
         </div>

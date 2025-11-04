@@ -5,7 +5,7 @@ import icon from '../components/icon';
 import axios from "axios";
 import { BaseUrl } from "../utils/Constans";
 import { useToast } from "../components/userToasd";
-
+import NotificacionesPanel from './NotificacionesPanel';
 
 function Header() {
     const location = useLocation();
@@ -78,6 +78,7 @@ function Header() {
                 {Pantalla}
               </h1>
           </section>
+
         </section>
     );
 }

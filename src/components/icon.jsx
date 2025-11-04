@@ -52,8 +52,10 @@ import bus2 from '../assets/bus2.svg';
 import escudobien from '../assets/escudobien.svg'
 import escudomalo from '../assets/escudomalo.svg'
 import error from '../assets/error.svg'
+import impresora2 from '../assets/impresora2.svg'
 
 const icon = {
+    impresora2,
     muela,
     llave,
     user,

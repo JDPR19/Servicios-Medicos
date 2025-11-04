@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './tabsFiltro.module.css';
+import styles from '../styles/tabsFiltro.module.css';
 
 function TabsNotificaciones({ tabs, activeTab, onTabClick }) {
     return (

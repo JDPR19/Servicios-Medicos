@@ -6,9 +6,9 @@ import { saveAs } from 'file-saver';
 // import cintillo from '../../public/assets/cintillo insai.png'
 
 function getRowValues(data, columns) {
-    return data.map(row =>
+    return data.map((row, idx)=>
         columns.map(col => {
-            let value = col.render ? col.render(row) : row[col.key];
+            let value = col.render ? col.render(row, idx) : row[col.key];
             if (['created_at', 'updated_at', 'fecha_notificacion'].includes(col.key)) {
                 value = formatFecha(value);
             }
@@ -59,7 +59,7 @@ export function exportToPDF({
             // const w = pageWidth - (margin.left + margin.right);
             // doc.addImage(cintillo, 'PNG', margin.left, CINTILLO_Y, w, CINTILLO_HEIGHT);
         } catch (e) {e}
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(40, 40, 40);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
         if (title) {
@@ -159,19 +159,26 @@ export function exportToPDF({
             halign: 'left',
             valign: 'middle',
             lineWidth: 0.1,
-            lineColor: [210, 210, 210]
+            lineColor: [200, 200, 200], // Bordes gris claro
+            textColor: [40, 40, 40],    // Texto gris oscuro
+            fillColor: [255, 255, 255], // Fondo blanco por defecto
         },
         headStyles: {
             fontStyle: 'bold',
             fontSize: Math.min(12, fontSize + 1),
-            fillColor: [152, 199, 154],
+            fillColor: [0, 101, 160],
             textColor: 255,
             halign: 'center',
             lineWidth: 0.15,
             lineColor: [200, 200, 200]
         },
-        bodyStyles: { lineWidth: 0.1, lineColor: [210, 210, 210] },
-        alternateRowStyles: { fillColor: [232, 245, 233] },
+        bodyStyles: { 
+            lineWidth: 0.1,
+            lineColor: [200, 200, 200],
+            fillColor: [255, 255, 255], // Fondo blanco
+            textColor: [40, 40, 40] 
+        },
+        alternateRowStyles: { fillColor: [230, 240, 250] },
         columnStyles,
         didParseCell: (data) => {
             const { cell, column, section } = data;

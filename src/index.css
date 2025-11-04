@@ -616,6 +616,13 @@ html { scroll-behavior: smooth; }
   grid-template-columns: 1.2fr 0.8fr 0.6fr 0.6fr;
   gap: 10px;
 }
+
+.pac-page .filters,
+.filters {
+  grid-template-columns: 1fr 1fr; /* El input será el doble de ancho que el select */
+  max-width: 500px; /* O el ancho que prefieras */
+  width: 100%;
+}
 .field{
   display: flex; align-items: center; gap: 8px;
   background: #fafafa;
@@ -668,7 +675,7 @@ html { scroll-behavior: smooth; }
 .btn-view,
 .btn-outline.btn-view {
   background: #FCD116 !important;
-  color: #444 !important;
+  color: var(--white) !important;
   border: 1px solid #FCD116 !important;
 }
 .btn-outline.btn-view {
@@ -678,7 +685,7 @@ html { scroll-behavior: smooth; }
 .btn-outline.btn-view:hover,
 .btn-outline.btn-view:focus {
   background: #FCD116 !important;
-  color: #444 !important;
+  color: var(--white) !important;
 }
 
 /* Botón Imprimir (turquesa) */
@@ -695,16 +702,21 @@ html { scroll-behavior: smooth; }
 .btn-outline.btn-print:hover,
 .btn-outline.btn-print:focus {
   background: #48cae4 !important;
-  color: #0033A0 !important;
+  color: var(--white) !important;
 }
 
-.actions{ display: flex; gap: 10px; align-items: center; }
+.actions{ 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  justify-content: center;
+}
 
 .btn{
   display: inline-flex; 
   align-items: center; 
   border-radius: 10px; 
-  padding: 2px 15px; 
+  padding: 5px 15px; 
   border: 1px solid transparent;
   background: var(--grey-tenue); 
   cursor: pointer; 
@@ -717,7 +729,10 @@ html { scroll-behavior: smooth; }
 .btn-primary:hover{ background: var(--rojo-principal); }
 .btn-outline{ background: transparent; border-color: var(--azul-two); color: var(--azul-texto); }
 .btn-outline:hover{ background: #f5fbff; }
-.btn-secondary{ background: var(--azul-two); color: var(--azul-texto); }
+.btn-secondary{ 
+  background: var(--azul); 
+  color: var(--white);
+  }
 .btn-secondary:hover{ filter: brightness(0.98); }
 .btn-xs{ padding: 4px 8px; border-radius: 8px; font-size: .85rem; }
 .btn-outline.btn-xs{ border: 1px solid var(--azul-two); background: transparent; }
@@ -975,11 +990,7 @@ html { scroll-behavior: smooth; }
   padding: 15px;
   box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
-.pac-page .filters{
-  display: grid;
-  grid-template-columns: 1.2fr 0.7fr 0.7fr 0.7fr 0.7fr;
-  gap: 5px;
-}
+
 .pac-page .field{
   display: flex;
   align-items: center;
