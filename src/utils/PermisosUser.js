@@ -12,6 +12,7 @@ export const PANTALLAS = [
     {key: 'reposos', label: 'Reposos', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar']},
     {key: 'bitacora', label: 'Seguimiento y Bitacora', acciones: ['ver']},
     {key: 'departamentos', label: 'Departamentos', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar']},
+    {key: 'finalidades', label: 'Finalidades', acciones: ['ver', 'crear', 'editar', 'eliminar']},
 ];
 
 export const ACCIONES = [
