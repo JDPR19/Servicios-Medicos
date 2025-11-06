@@ -279,7 +279,7 @@ function ForDepartamento({ initialData = {}, onSave, onClose }) {
     return (
         <form onSubmit={isEdit ? handleEdit : handleRegister}>
         <div className="forc-grid">
-            <div className="fc-field">
+            <div className="fc-field" style={{gridColumn: "1 / -1"}}>  
             <label><span className="unique">*</span>Nombre</label>
             <input
                 name="nombre"
@@ -307,18 +307,17 @@ function ForDepartamento({ initialData = {}, onSave, onClose }) {
             <label>Autocompletados de descripción (opcional)</label>
             <div className="desc-suggestions">
                 {SUGGESTIONS.map((s) => (
-                <label
+                    <label
                     key={s.id}
-                    className="checkbox"
-                    style={{ alignItems: "flex-start" }}
-                >
+                    className="desc-sug-item"
+                    >
+                    <span className="desc-sug-text">{s.label}</span>
                     <input
-                    type="checkbox"
-                    checked={selectedSugs.has(s.id)}
-                    onChange={() => toggleSuggestion(s)}
+                        type="checkbox"
+                        checked={selectedSugs.has(s.id)}
+                        onChange={() => toggleSuggestion(s)}
                     />
-                    <span>{s.label}</span>
-                </label>
+                    </label>
                 ))}
             </div>
 
@@ -428,7 +427,7 @@ function ForDepartamento({ initialData = {}, onSave, onClose }) {
                 />
                 <button
                     type="button"
-                    className="btn btn-outline btn-danger"
+                    className=" btn btn-danger btn-xs"
                     onClick={() => removeRow(idx)}
                     title="Eliminar fila"
                 >

@@ -299,7 +299,7 @@ return (
     <div className="pac-toolbar">
         <div className="filters">
         <div className="field">
-            <img src={icon.calendario} alt="Buscar" className="field-icon" />
+            <img src={icon.lupa2} alt="Buscar" className="field-icon" />
             <input
             type="text"
             placeholder="Buscar por nombre de rol..."

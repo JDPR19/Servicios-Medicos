@@ -122,11 +122,11 @@ return (
             </div>
 
             <div className='forc-actions' style={{marginTop:30, marginBottom:20}}>
-                <button className="btn btn-outline" type="button" onClick={onClose}>
+                <button className="btn btn-outline" type="button" onClick={onClose} disabled={loading}>
                     Cancelar
                 </button>
                 <div className="forc-actions-right">
-                    <button className="btn btn-secondary" type="button" onClick={handleClear}>
+                    <button className="btn btn-secondary" type="button" onClick={handleClear} disabled={loading}>
                     Limpiar
                     </button>
                     <button className="btn btn-primary" type="submit" disabled={loading}>

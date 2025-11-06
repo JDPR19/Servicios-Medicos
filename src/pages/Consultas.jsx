@@ -109,7 +109,7 @@ function Consultas() {
         <div className="pac-toolbar">
           <div className="filters">
             <div className="field">
-              <img src={icon.buscar || icon.calendario} alt="" className="field-icon" />
+              <img src={icon.lupa2} alt="" className="field-icon" />
               <input type="text" placeholder="Buscar por cédula, nombre o apellido…" />
             </div>
             <div className="field">

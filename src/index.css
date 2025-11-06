@@ -964,7 +964,7 @@ html { scroll-behavior: smooth; }
 .forc-actions-right{ display: flex; gap: 8px; }
 
 .desc-suggestions {
-  display: flex;
+  display: grid;
   flex-direction: column;
   gap: 6px;
   max-height: 240px;
@@ -975,6 +975,24 @@ html { scroll-behavior: smooth; }
   background: #fafafa;
   scrollbar-width: thin;
 }
+
+.desc-sug-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* texto izquierda, checkbox derecha */
+  width: 100%;
+  gap: 8px;
+  padding: 4px 8px;
+}
+.desc-sug-text {
+  flex: 1;
+}
+
+.desc-sug-item input[type="checkbox"] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
 .desc-suggestions::-webkit-scrollbar {
   width: 6px;
 }

@@ -97,7 +97,7 @@ export function exportToPDF({
     drawHeader();
 
     const tableColumn = columns.map(col => col.header);
-    const tableRows = rows.map(row => row.map(v => v == null ? '' : String(v))); // CORREGIDO
+    const tableRows = rows.map(row => row.map(v => v == null ? '' : String(v))); 
 
     const baseFont = 10;
     const fontSize = Math.max(6, baseFont - Math.floor((columns.length - 4) / 2));
@@ -129,6 +129,11 @@ export function exportToPDF({
         widths = widths.map(w => Math.max(minColW, Math.min(maxColW, w * factor)));
     }
 
+    const tableWidth = widths.reduce((a, b) => a + b, 0);
+    const canCenter = tableWidth <= usableWidth;
+    const centerLeft = canCenter ? Math.max(10, (pageWidth - tableWidth) / 2) : margin.left;
+    const centerRight = canCenter ? centerLeft : margin.right;
+
     const columnStyles = {};
     columns.forEach((col, idx) => {
         columnStyles[idx] = {
@@ -148,8 +153,8 @@ export function exportToPDF({
         body: tableRows,
         startY: TABLE_START_Y,
         theme: 'grid',
-        tableWidth: 'auto',
-        margin,
+        tableWidth: canCenter ? tableWidth : 'auto',
+        margin: { ...margin, left: centerLeft, right: centerRight },
         styles: {
             font: 'helvetica',
             fontSize,
@@ -212,7 +217,7 @@ export function exportToExcel({
     totalLabel = 'TOTAL',
     count = false
 }) {
-    const rows = getRowValues(data, columns); // CORREGIDO: usa render
+    const rows = getRowValues(data, columns); 
     const worksheetData = [
         columns.map(col => col.header.toUpperCase()),
         ...rows.map(row => row.map(v => v == null ? '' : String(v))) // CORREGIDO

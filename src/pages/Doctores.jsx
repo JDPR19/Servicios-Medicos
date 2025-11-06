@@ -332,7 +332,7 @@ const exportColumns = [
         <div className="pac-toolbar">
           <div className="filters">
             <div className="field">
-              <img src={icon.calendario} alt="" className="field-icon" />
+              <img src={icon.lupa2} alt="" className="field-icon" />
               <input
                 type="text"
                 placeholder="Buscar por cédula, nombre o apellido…"
@@ -355,10 +355,10 @@ const exportColumns = [
 
           <div className="actions">
             <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.impresora2} className="btn-icon" alt="PDF" style={{marginRight:5}}/> PDF
+              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{marginRight:5}}/> PDF
             </button>
             <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.impresora2} className="btn-icon" alt="EXCEL" style={{marginRight:5}} /> Excel
+              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{marginRight:5}} /> Excel
             </button>
           <button className="btn btn-primary" onClick={handleNuevo}>
             <img src={icon.user5} className="btn-icon" alt="" style={{marginRight:5}}/> Nuevo Doctor

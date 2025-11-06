@@ -3,6 +3,11 @@ import llave from '../assets/llave.svg';
 import user from '../assets/user.svg';
 import user4 from '../assets/user plus.svg';
 import user5 from '../assets/userplus.svg';
+import lupa from '../assets/lupa.svg';
+import lupa2 from '../assets/lupa2.svg';
+import pdf1 from '../assets/pdf5.svg';
+import habilitar from '../assets/habilitar.svg';
+import deshabilitar from '../assets/deshabilitar.svg';
 import ojito from '../assets/ojito.svg';
 import ojitoculto from '../assets/ojitoculto.svg';
 import admin from '../assets/admin.svg';
@@ -49,12 +54,25 @@ import cv3 from '../assets/cv3.svg';
 import bus from '../assets/bus.svg';
 import bus1 from '../assets/bus1.svg';
 import bus2 from '../assets/bus2.svg';
-import escudobien from '../assets/escudobien.svg'
-import escudomalo from '../assets/escudomalo.svg'
-import error from '../assets/error.svg'
-import impresora2 from '../assets/impresora2.svg'
+import cliente from '../assets/cliente.svg';
+import escudobien from '../assets/escudobien.svg';
+import escudomalo from '../assets/escudomalo.svg';
+import error from '../assets/error.svg';
+import excel from '../assets/excel.svg';
+import excel2 from '../assets/excel2.svg';
+import bitacora from '../assets/bitacora.svg';
+import impresora2 from '../assets/impresora2.svg';
 
 const icon = {
+    cliente,
+    pdf1,
+    lupa,
+    lupa2,
+    habilitar,
+    deshabilitar,
+    bitacora,
+    excel,
+    excel2
     impresora2,
     muela,
     llave,
