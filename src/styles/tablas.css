@@ -1,5 +1,5 @@
 .table-wrapper {
-    width: 90%;
+    width: max-content;
     margin: 0.1rem auto;
     font-family: 'Roboto',sans-serif;
 }

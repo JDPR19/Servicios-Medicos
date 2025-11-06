@@ -11,19 +11,21 @@ import Historias from './pages/Historias.jsx';
 import Seguimiento from './pages/SeguimientoPaciente.jsx';
 import Reposos from './pages/Reposos.jsx';
 import Doctores from './pages/Doctores.jsx';
-
+import Cargos from './pages/Cargos.jsx';
+import Departamentos from './pages/Departamentos';
 ////////////////////////// PANTALLAS FORMULARIOS ////////////////
 import ForConsultas from './Formularios/ForConsultas';
 import ForPacientes from './Formularios/ForPaciente.jsx'; 
 import ForHistorias from './Formularios/ForHistorias.jsx';
 import ForReposos from './Formularios/ForReposos.jsx';
 import ForDoctor from './Formularios/ForDoctor.jsx';
+import ForCargos from './Formularios/ForCargo.jsx';
+import ForDepartamentos from './Formularios/ForDepartamento.jsx';
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
-import Header from "./components/header.jsx";
 import { AlertProvider } from './components/AlertProvider.jsx';
 import { ToastProvider } from './components/ToapsProvider.jsx';
-//////////////////////////PANTALLA DE ERROR - SEGURIDAD PARA RUTAS///////////////////
+import AutoLogout from './components/AutoLogout.jsx';
 ////////////////////////// IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
 import SeccionOne from './pages/SeccionOne.jsx';
 ////////////////////////// FIN IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
@@ -38,6 +40,7 @@ function App() {
     <ToastProvider>
       <AlertProvider>
         <BrowserRouter>
+          <AutoLogout />
           <Routes>
             {/* RUTAS PÚBLICAS */}
               <Route 
@@ -71,6 +74,10 @@ function App() {
                   <Route path='Doctores' element={<Doctores/>} />
                   <Route path='ForDoctor' element={<ForDoctor/>} />
                   <Route path='SeccionOne' element={<SeccionOne/>} />
+                  <Route path='Cargos' element={<Cargos/>} />
+                  <Route path='ForCargos' element={<ForCargos/>} />
+                  <Route path='Departamentos' element={<Departamentos/>} />
+                  <Route path='ForDepartamentos' element={<ForDepartamentos/>}/>
                 </Route>
 
               {/* RUTA PARA ERROR 404 */}

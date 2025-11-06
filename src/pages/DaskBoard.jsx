@@ -4,7 +4,7 @@ import Card from '../components/Card';
 import icon from '../components/icon';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from "../components/userAlert";
-import { useToast } from "../components/userToasd";
+// import { useToast } from "../components/userToasd";
 import Spinner from '../components/spinner';
 import React, { useState } from 'react';
 import Pogress from '../components/Pogress';
@@ -12,8 +12,8 @@ import Pogress from '../components/Pogress';
 function DashboardPage() {
   const navigate = useNavigate();
   const showAlert = useAlert();
-  const showToast = useToast();
-  const [loading, setLoading] = useState(false);
+  // const showToast = useToast();
+  // const [loading, setLoading] = useState(false);
   const [pgVisible, setPgVisible] = useState(false);
   const progressDuration = 5000;
   const handleCard = () => {

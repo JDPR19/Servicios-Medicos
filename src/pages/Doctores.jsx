@@ -163,7 +163,7 @@ const handleDelete = async (id) => {
     return { total, activos, inactivos, thisMonth };
   }, [doctores]);
 
-const filtered = useMemo(() => {                 // ← aplicar filtros realmente
+const filtered = useMemo(() => {                
     const q = filters.q.trim().toLowerCase();
     const est = filters.estado;
     return doctores.filter(d => {
@@ -235,7 +235,7 @@ const exportColumns = [
     <div className="pac-page">
       {loading && (
         <div className="spinner-overlay">
-          <Spinner size={50} label="Cargando doctores..." />
+          <Spinner size={50} label="Cargando Doctores...." />
         </div>
       )}
 
@@ -326,18 +326,13 @@ const exportColumns = [
           <span className="number">{stats.inactivos}</span>
           <h3>Doctores Inactivos</h3>
         </Card>
-        {/* <Card color="#FCD116" title="Atenciones este mes">
-          <img src={icon.user5} alt="" className="icon-card" />
-          <span className="number">{stats.thisMonth}</span>
-          <h3>Atenciones (Mes)</h3>
-        </Card> */}
       </section>
 
       <section className="quick-actions2">
         <div className="pac-toolbar">
           <div className="filters">
             <div className="field">
-              <img src={icon.buscar || icon.calendario} alt="" className="field-icon" />
+              <img src={icon.calendario} alt="" className="field-icon" />
               <input
                 type="text"
                 placeholder="Buscar por cédula, nombre o apellido…"

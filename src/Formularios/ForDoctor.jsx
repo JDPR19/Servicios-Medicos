@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import icon from "../components/icon";
 import "../index.css";
 import axios from "axios";
 import { BaseUrl } from "../utils/Constans";
@@ -31,8 +30,8 @@ cedula: "",
 nombre: "",
 apellido: "",
 contacto: "",
-cargos_id: "",
-profesion_id: "",
+cargos_id: null,
+profesion_id: null,
 estado: true,
 ...initialData,
 };
@@ -246,7 +245,7 @@ return (
         <SingleSelect
             options={cargos.map(c => ({ value: c.id, label: c.nombre }))}
             value={cargos.find(c => c.id === form.cargos_id) ? { value: form.cargos_id, label: cargos.find(c => c.id === form.cargos_id)?.nombre } : null}
-            onChange={opt => setForm(f => ({ ...f, cargos_id: opt ? opt.value : "" }))}
+            onChange={opt => setForm(f => ({ ...f, cargos_id: opt ? opt.value : null }))}
             placeholder="Seleccione…"
             isClearable={false}
         />
@@ -256,7 +255,7 @@ return (
         <SingleSelect
             options={profesiones.map(p => ({ value: p.id, label: p.carrera }))}
             value={profesiones.find(p => p.id === form.profesion_id) ? { value: form.profesion_id, label: profesiones.find(p => p.id === form.profesion_id)?.carrera } : null}
-            onChange={opt => setForm(f => ({ ...f, profesion_id: opt ? opt.value : "" }))}
+            onChange={opt => setForm(f => ({ ...f, profesion_id: opt ? opt.value : null}))}
             placeholder="Seleccione…"
             isClearable={false}
         />
@@ -264,11 +263,11 @@ return (
     </div>
 
     <div className="forc-actions" style={{marginTop:30, marginBottom:20}}>
-        <button className="btn btn-outline" type="button" onClick={onClose}>
+        <button className="btn btn-outline" type="button" onClick={onClose} disabled={loading}>
             Cancelar
         </button>
         <div className="forc-actions-right">
-            <button className="btn btn-secondary" type="button" onClick={handleClear}>
+            <button className="btn btn-secondary" type="button" onClick={handleClear} disabled={loading}>
             Limpiar
             </button>
             <button className="btn btn-primary" type="submit" disabled={loading}>

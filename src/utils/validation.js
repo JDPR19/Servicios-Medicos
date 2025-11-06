@@ -14,7 +14,7 @@ export const validateField = (value, regex, errorMessage) => {
 };
 
 export const campos = [
-
+    {id:'correo', tipo:'email'},
 ];
 
 export const getValidationRule = (field) => {
@@ -35,7 +35,7 @@ export const validationRules = {
         errorMessage: 'La cédula debe tener 7 u 8 dígitos, con o sin prefijo V- o E-'
     },
 
-   nombre: {
+    nombre: {
         regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
         errorMessage: 'El nombre solo puede contener letras y espacios'
     },
