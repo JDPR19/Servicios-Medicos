@@ -1,5 +1,5 @@
 .table-wrapper {
-    width: max-content;
+    width: 90%;
     margin: 0.1rem auto;
     font-family: 'Roboto',sans-serif;
 }
@@ -43,7 +43,7 @@
 .custom-table th, 
 .custom-table td {
     padding: 15px 10px;
-    text-align: left;
+    text-align: center;
     border-bottom: 1px solid #ddd;
     cursor: pointer;
     text-overflow: ellipsis;
