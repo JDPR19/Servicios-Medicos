@@ -56,7 +56,7 @@ const handleClear = () => {
 
 const getAuthorization = () => {
     const token = (localStorage.getItem('token') || '').trim();
-    return token ? { authorization: `Bearer ${token} `} : {};
+    return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 ///////////////////////////////Peticiones o solicitudes///////////////////////////////////////////////////////////// 
@@ -68,13 +68,14 @@ const getAuthorization = () => {
         }
         setLoading(true);
         try{
-            const response = await axios.post(`${BaseUrl}finalidad/registrar`, form, { headers: getAuthorization() });
+            const response = await axios.post(`${BaseUrl}finalidades/registrar`, form, { headers: getAuthorization() });
             ShowToast?.('Finalidad registrada con exito', 'success');
             if(onSave) onSave(response.data);
             if(onClose) onClose();
         }catch(error){
-            console.error('Error registrando Finalidad', error?.response?.data || error.message);
-            ShowToast?.('error registrando Finaldiad', 'error');
+            const msg = error?.response?.data?.message || 'Error registrando Finalidad';
+            console.error('Error registrando Finalidad', msg);
+            ShowToast?.(msg, 'error');
         }finally{
             setLoading(false);
         }
@@ -88,7 +89,7 @@ const getAuthorization = () => {
         }   
         setLoading(true);
         try{
-            const response = axios.put(`${BaseUrl}finalidad/actualizar/${initialData.id}`, form, {headers: getAuthorization() });
+            const response = await axios.put(`${BaseUrl}finalidades/actualizar/${initialData.id}`, form, {headers: getAuthorization() });
             ShowToast?.('Finalidad actualizada con exito', 'success');
             if(onSave) onSave(response.data);
             if(onClose) onClose();

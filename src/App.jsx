@@ -13,6 +13,9 @@ import Reposos from './pages/Reposos.jsx';
 import Doctores from './pages/Doctores.jsx';
 import Cargos from './pages/Cargos.jsx';
 import Departamentos from './pages/Departamentos';
+import Categoria_e from './pages/Categoria_e.jsx';
+import Categoria_m from './pages/Categoria_m.jsx';
+import Medicamentos from './pages/Medicamentos.jsx';
 ////////////////////////// PANTALLAS FORMULARIOS ////////////////
 import ForConsultas from './Formularios/ForConsultas';
 import ForPacientes from './Formularios/ForPaciente.jsx'; 
@@ -21,13 +24,18 @@ import ForReposos from './Formularios/ForReposos.jsx';
 import ForDoctor from './Formularios/ForDoctor.jsx';
 import ForCargos from './Formularios/ForCargo.jsx';
 import ForDepartamentos from './Formularios/ForDepartamento.jsx';
+import ForMedicamentos from './Formularios/ForMedicamentos.jsx';
+import ForCategoria_e from './Formularios/ForCategoria_e.jsx';
+import ForCategoria_m from './Formularios/ForCategoria_m.jsx';
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
 import { AlertProvider } from './components/AlertProvider.jsx';
 import { ToastProvider } from './components/ToapsProvider.jsx';
 import AutoLogout from './components/AutoLogout.jsx';
+import ProtectedRoute from './utils/ProtectedRoute.jsx';
 ////////////////////////// IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
 import SeccionOne from './pages/SeccionOne.jsx';
+import SeccionTwo from './pages/SeccionTwo.jsx';
 ////////////////////////// FIN IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////
 //////////////////////////IMPORTACIONES DE PANTALLAS DE ERRORES Y SEGURIDAD PARA RUTAS//////////////////////////
 import Error from './pages/Error.jsx';
@@ -61,23 +69,127 @@ function App() {
 
               {/* RUTAS PRIVADAS */}
                 <Route path='/admin' element={<MainLayout/>}>
-                  <Route index element={<DaskBoard/>} />
-                  <Route path='Consultas' element={<Consultas/>} />
-                  <Route path='ForConsultas' element={<ForConsultas/>} />
-                  <Route path='Pacientes' element={<Pacientes/>} />
-                  <Route path='ForPacientes' element={<ForPacientes/>} />
-                  <Route path='Historias' element={<Historias/>} />
-                  <Route path='ForHistorias' element={<ForHistorias/>} />
-                  <Route path='Seguimiento' element={<Seguimiento/>} />
-                  <Route path='Reposos' element={<Reposos/>} />
-                  <Route path='ForReposos' element={<ForReposos/>} />
-                  <Route path='Doctores' element={<Doctores/>} />
-                  <Route path='ForDoctor' element={<ForDoctor/>} />
-                  <Route path='SeccionOne' element={<SeccionOne/>} />
-                  <Route path='Cargos' element={<Cargos/>} />
-                  <Route path='ForCargos' element={<ForCargos/>} />
-                  <Route path='Departamentos' element={<Departamentos/>} />
-                  <Route path='ForDepartamentos' element={<ForDepartamentos/>}/>
+            
+                  <Route index element={
+                      <ProtectedRoute pantalla='home'>  
+                        <DaskBoard/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Consultas' element={
+                    <ProtectedRoute pantalla='consultas'>
+                      <Consultas/>
+                    </ProtectedRoute>
+                  } />
+                  <Route path='ForConsultas' element={
+                      <ProtectedRoute pantalla='consultas'>
+                        <ForConsultas/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Pacientes' element={
+                      <ProtectedRoute pantalla='pacientes'>
+                        <Pacientes/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Pacientes' element={
+                    <ProtectedRoute pantalla='pacientes'>
+                      <ForPacientes/>
+                    </ProtectedRoute>
+                    } />
+                  <Route path='Historias' element={
+                      <ProtectedRoute pantalla='historias'>
+                        <Historias/>
+                      </ProtectedRoute>
+                  } />
+                  <Route path='ForHistorias' element={
+                      <ProtectedRoute pantalla='historias'>  
+                        <ForHistorias/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Seguimiento' element={
+                      <ProtectedRoute pantalla='seguimiento'>
+                        <Seguimiento/>
+                      </ProtectedRoute>
+                  } />
+                  <Route path='Reposos' element={
+                      <ProtectedRoute pantalla='reposos'>
+                        <Reposos/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='ForReposos' element={
+                      <ProtectedRoute pantalla='reposos'>
+                        <ForReposos/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Doctores' element={
+                      <ProtectedRoute pantalla='doctores'>
+                        <Doctores/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='ForDoctor' element={
+                      <ProtectedRoute pantalla='doctores'>
+                        <ForDoctor/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='SeccionOne' element={
+                      <ProtectedRoute pantalla='home'>
+                        <SeccionOne/>
+                      </ProtectedRoute>
+                    } />
+                    <Route path='SeccionTwo' element={
+                      <ProtectedRoute pantalla='home'>
+                        <SeccionTwo/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Cargos' element={
+                      <ProtectedRoute pantalla='cargos'>
+                        <Cargos/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='ForCargos' element={
+                      <ProtectedRoute pantalla='cargos'>
+                        <ForCargos/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='Departamentos' element={
+                      <ProtectedRoute pantalla='departamentos'>
+                        <Departamentos/>
+                      </ProtectedRoute>
+                    } />
+                  <Route path='ForDepartamentos' element={
+                      <ProtectedRoute pantalla='departamentos'>
+                        <ForDepartamentos/>
+                      </ProtectedRoute>
+                    }/>
+                  <Route path='Medicamentos' element={
+                      <ProtectedRoute pantalla='medicamentos'>
+                        <Medicamentos/>
+                      </ProtectedRoute>
+                    }/>
+                  <Route path='ForMedicamentos' element={
+                      <ProtectedRoute pantalla='medicamentos'>  
+                        <ForMedicamentos/>
+                      </ProtectedRoute>
+                    }/>
+                  <Route path='Categoria_e' element={
+                      <ProtectedRoute pantalla='categoria_e'>
+                        <Categoria_e/>
+                      </ProtectedRoute>
+                    }/>
+                  <Route path='ForCategoria_e' element={
+                      <ProtectedRoute pantalla='categoria_e'>
+                        <ForCategoria_e/>
+                      </ProtectedRoute>
+                    }/>
+                  <Route path='Categoria_m' element={
+                        <ProtectedRoute pantalla='categoria_m'>
+                          <Categoria_m/>
+                        </ProtectedRoute>
+                    }/>
+                  <Route path='ForCategoria_m' element={
+                      <ProtectedRoute pantalla='categoria_m'>
+                        <ForCategoria_m/>
+                      </ProtectedRoute>
+                    }/>
                 </Route>
 
               {/* RUTA PARA ERROR 404 */}

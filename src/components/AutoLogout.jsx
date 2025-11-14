@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { BaseUrl } from '../utils/Constans';
 import { io as ioClient } from 'socket.io-client';
 
-const API_URL =  BaseUrl;
+const API_URL = BaseUrl;
 const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutos
 
 const AutoLogout = () => {

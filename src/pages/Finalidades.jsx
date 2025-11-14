@@ -26,7 +26,7 @@ function Finalidades () {
     //////////////////////////////helpers o Ayudantes/////////////////////////////////////////////////////
     const getAuthorization = () => {
         const token = (localStorage.getItem('token') || '').trim();
-        return token ? {Authorization: ` Bearer  ${token}`} : {};
+        return token ? { Authorization: `Bearer ${token}` } : {};
     } 
 
     const openConfirmDelete = (id) => {
@@ -74,7 +74,7 @@ function Finalidades () {
             key: "order",
             render: (_row, idx) => idx + 1 
         },
-        {accesor: "nombre", header:"Nombre", key: "nombre"},
+        {accessor: "nombre", header:"Nombre", key: "nombre"},
         {
             header:"Acciones",
             render: (row) => (
@@ -92,7 +92,7 @@ function Finalidades () {
 const fetchFinalidades =  async () => {
     setLoading(true);
     try{
-        const response = await axios.get(`${BaseUrl}finalidad`, { headers: getAuthorization() });
+        const response = await axios.get(`${BaseUrl}finalidades`, { headers: getAuthorization() });
         const data = response.data;
         if(!Array.isArray(data)) {
             console.warn('Respuesta Inesperada finalidades:', data);
@@ -115,10 +115,10 @@ const fetchFinalidades =  async () => {
 
 //////////////////////////////////////////////////////////////////Manejadores/////////////////////////////////////////////////////////////////////////// 
 
-const handleView = async (id) => {
+const handleView = async (row) => {
     setLoading(true);
     try{
-        const response = await axios.get(`${BaseUrl}finalidad/ver/${row.id}`, {headers: getAuthorization() });
+        const response = await axios.get(`${BaseUrl}finalidades/ver/${row.id}`, {headers: getAuthorization() });
         setFinalidadesToShow(response.data);
     }catch(error){
         console.error('Error al mostrar los datos de esta finalidad', error?.response?.data || error.message);
@@ -131,7 +131,7 @@ const handleView = async (id) => {
 const handleDelete = async (id) => {
     setLoading(true);
     try{
-        await axios.delete(`${BaseUrl}finalidad/delete/${id}`, { headers: getAuthorization() });
+        await axios.delete(`${BaseUrl}finalidades/delete/${id}`, { headers: getAuthorization() });
         showToast('Finalidad Eliminada Con exito', 'success', 3000);
         await fetchFinalidades();
     }catch(error){
@@ -208,17 +208,17 @@ const handleDelete = async (id) => {
                                 type="text"
                                 placeholder='Buscar por nombre de finalidad'
                                 value={filters.q}
-                                onchange={(e) => setFilters(f => ({...f, q: e.target.value }))}
+                                onChange={(e) => setFilters(f => ({...f, q: e.target.value }))}
                             />
                         </div>
 
+                        </div>
                         <div className='actions'>
                             <button className='btn btn-primary' onClick={handleNuevo}>
                                 <img src={icon.user5} alt="Nuevo Registro" className='btn-icon' style={{marginRight:5}}/>
                                 Nueva finalidad
                             </button>
                         </div>
-                    </div>
 
                 </div>
             </section>

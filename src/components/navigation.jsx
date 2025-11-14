@@ -44,6 +44,7 @@ function Header() {
         '/admin/Reposos' : 'Reposos',
         '/admin/ForReposos' : 'Nuevo Reposo',
         '/admin/SeccionOne' : 'Administrador',
+        '/admin/SeccionTwo' : 'Stock de Inventario',
     };
 
     const Pantalla = routeToTitle[location.pathname] || 'Cuidarte Yutong';

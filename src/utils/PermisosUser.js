@@ -13,6 +13,9 @@ export const PANTALLAS = [
     {key: 'bitacora', label: 'Seguimiento y Bitacora', acciones: ['ver']},
     {key: 'departamentos', label: 'Departamentos', acciones: ['ver', 'crear', 'editar', 'eliminar', 'exportar']},
     {key: 'finalidades', label: 'Finalidades', acciones: ['ver', 'crear', 'editar', 'eliminar']},
+    {key: 'categoria_e', label: 'Categoria de Patologias', acciones: ['ver', 'crear', 'editar', 'eliminar']},
+    {key: 'categoria_m', label: 'Categoria de Medicamentos', acciones: ['ver', 'crear', 'editar', 'eliminar']},
+    {key: 'medicamentos', label: 'Medicamentos', acciones: ['ver', 'crear', 'editar', 'eliminar']},
 ];
 
 export const ACCIONES = [

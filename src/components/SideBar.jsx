@@ -20,6 +20,7 @@ function Sidebar() {
         { to: '/admin/Historias', label: 'Historias', icon: icon.folder },
         { to: '/admin/Reposos', label: 'Reposos', icon: icon.mascarilla },
         { to: '/admin/SeccionOne', label: 'Administrador', icon: icon.admin},
+        { to: '/admin/SeccionTwo', label: 'Stock', icon: icon.maletindoctor3},
     ];
 
     return (

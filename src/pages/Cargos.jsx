@@ -14,12 +14,12 @@ import { useToast } from '../components/userToasd';
 
 function Cargos () {
 const [loading, setLoading] = useState(false);
+const [confirmModal, setConfirmModal] = useState(false);
+const [modalOpen, setModalOpen] = useState(false);
 const [cargos, setCargos] = useState([]);
 const [filters, setFilters] = useState({estado: "todos", q:""});
-const [confirmModal, setConfirmModal] = useState(false);
 const [selectedCargo, setSelectedCargo] = useState(null);
 const [editCargo, setEditCargo] = useState(null);
-const [modalOpen, setModalOpen] = useState(false);
 const [cargosToshow, setCargosToShow] = useState(null);
 const showToast = useToast();
     
@@ -114,7 +114,7 @@ useEffect(() => {
     fecthCargos();
 }, []);
 
-// ////////////////////////////////////Manejadores///////////////////////////////////////////////////////////
+//////////////////////////////////////Manejadores///////////////////////////////////////////////////////////
 const handleView = async (row) => {
     setLoading(true);
     try{

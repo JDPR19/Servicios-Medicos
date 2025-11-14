@@ -27,7 +27,7 @@ function Landing() {
                 haz seguimiento a tratamientos en un solo lugar.
               </p>
               <div className="heroCtas">
-                <buttom onClick={irPagina} className="btn-estandar" title='Ve a Iniciar Sesión'>Entrar al sistema</buttom>
+                <button onClick={irPagina} className="btn-estandar" title='Ve a Iniciar Sesión'>Entrar al sistema</button>
                 <a href="#caracteristicas" className="btn-outlinee"  title='Sobre Nosotros'>Conocer más</a>
               </div>
               <ul className="heroHighlights">

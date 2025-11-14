@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../index.css';
 import icon from '../components/icon';
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +20,15 @@ function Login () {
     };
 
     const irHome = () => {
-        navigate('/admin');
+        navigate('/admin', { replace: true });
     };
+
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        navigate("/admin", { replace: true });
+    }
+    }, [navigate]);
 
     const handleLogin = async () => {
         if (!form.username.trim()) {
