@@ -13,7 +13,7 @@ import ojitoculto from '../assets/ojitoculto.svg';
 import admin from '../assets/admin.svg';
 import altavoz from '../assets/altavoz.svg';
 import calendario from '../assets/calendario.svg';
-import camionsito  from '../assets/camionsito.svg';
+import camionsito from '../assets/camionsito.svg';
 import candado from '../assets/candado.svg';
 import candado2 from '../assets/candado2.svg';
 import carpetaplus from '../assets/carpetaplus.svg';
@@ -62,8 +62,14 @@ import excel from '../assets/excel.svg';
 import excel2 from '../assets/excel2.svg';
 import bitacora from '../assets/bitacora.svg';
 import impresora2 from '../assets/impresora2.svg';
+import agotado from '../assets/agotado.svg';
+import agotar from '../assets/poragotar.svg';
+import medicamentos from '../assets/medicamentos.svg';
 
 const icon = {
+    medicamentos,
+    agotado,
+    agotar,
     cliente,
     pdf1,
     lupa,

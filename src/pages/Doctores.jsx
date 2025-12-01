@@ -23,13 +23,13 @@ function Doctores() {
   const [doctorToShow, setDoctorToShow] = useState(null);
   const [doctores, setDoctores] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ estado: "todos", q: "" }); 
+  const [filters, setFilters] = useState({ estado: "todos", q: "" });
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editDoctor, setEditDoctor] = useState(null);
 
-//////---------------------helpers para token y autorization en fetcher y handles -----------------------------/////// 
+  //////---------------------helpers para token y autorization en fetcher y handles -----------------------------/////// 
   const getAuthHeaders = () => {
     const token = (localStorage.getItem('token') || '').trim();
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -40,12 +40,13 @@ function Doctores() {
     setConfirmModal(true);
   };
 
-const closeConfirmDelete = () => {
-  setSelectedDoctor(null);
-  setConfirmModal(false);
-};
+  const closeConfirmDelete = () => {
+    setSelectedDoctor(null);
+    setConfirmModal(false);
+  };
 
-const handleNuevo = () => {
+  // boton nuevo
+  const handleNuevo = () => {
     setEditDoctor();
     setModalOpen(true);
   };
@@ -56,7 +57,7 @@ const handleNuevo = () => {
     setModalOpen(true);
   };
 
-  // Al guardar, refresca la tabla y cierra el modal
+  // Al guardar, refresca la tabla y cierra el modal modalformulario
   const handleSaved = () => {
     fetchDoctores();
     setModalOpen(false);
@@ -65,37 +66,37 @@ const handleNuevo = () => {
 
 
 
-const handlePreviewPDF = () => {
-  const docBlob = exportToPDF({
-    data: filtered,
-    columns: exportColumns,
-    fileName: "doctores.pdf",
-    title: "Listado de Doctores",
-    preview: true
-  });
-  if (docBlob) {
-    const url = URL.createObjectURL(docBlob);
-    setPdfUrl(url);
-  }
-};
+  const handlePreviewPDF = () => {
+    const docBlob = exportToPDF({
+      data: filtered,
+      columns: exportColumns,
+      fileName: "doctores.pdf",
+      title: "Listado de Doctores",
+      preview: true
+    });
+    if (docBlob) {
+      const url = URL.createObjectURL(docBlob);
+      setPdfUrl(url);
+    }
+  };
 
-const handleExportExcel = () => {
-  exportToExcel({
-    data: filtered,
-    columns: exportColumns,
-    fileName: "doctores.xlsx",
-    count: true, 
-    totalLabel: "TOTAL DE REGISTROS"
-  });
-};
+  const handleExportExcel = () => {
+    exportToExcel({
+      data: filtered,
+      columns: exportColumns,
+      fileName: "doctores.xlsx",
+      count: true,
+      totalLabel: "TOTAL DE REGISTROS"
+    });
+  };
 
-const estadoOptions = [
-  { value: "todos", label: "Estado" },
-  { value: "activo", label: "Activo" },
-  { value: "inactivo", label: "Inactivo" }
-];
-//////////////////////////////////////////----Llamada de los datos al montar el componente ----/////////////////////////////////////////////////////////////////////////////// 
-const fetchDoctores = async () => {
+  const estadoOptions = [
+    { value: "todos", label: "Estado" },
+    { value: "activo", label: "Activo" },
+    { value: "inactivo", label: "Inactivo" }
+  ];
+  //////////////////////////////////////////----Llamada de los datos al montar el componente ----/////////////////////////////////////////////////////////////////////////////// 
+  const fetchDoctores = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${BaseUrl}doctores`, { headers: getAuthHeaders() });
@@ -115,25 +116,25 @@ const fetchDoctores = async () => {
       setLoading(false);
     }
   };
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-  
-  //////////-------------------- Manejador de vista por id ----------------------------------///////////////
-const handleView = async (row) => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${BaseUrl}doctores/ver/${row.id}`, { headers: getAuthHeaders() });
-    setDoctorToShow(res.data);
-  } catch (error) {
-    console.error('error Al mostrar datos por id de doctor', error);
-    showToast?.('No se pudo obtener la información del doctor', 'error');
-  } finally {
-    setLoading(false);
-  }
-};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
-//////////-------------------- Manejador de Eliminado por id ----------------------------------////////////
-const handleDelete = async (id) => {
+  //////////-------------------- Manejador de vista por id ----------------------------------///////////////
+  const handleView = async (row) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BaseUrl}doctores/ver/${row.id}`, { headers: getAuthHeaders() });
+      setDoctorToShow(res.data);
+    } catch (error) {
+      console.error('error Al mostrar datos por id de doctor', error);
+      showToast?.('No se pudo obtener la información del doctor', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+  //////////-------------------- Manejador de Eliminado por id ----------------------------------////////////
+  const handleDelete = async (id) => {
     setLoading(true);
     try {
       await axios.delete(`${BaseUrl}doctores/eliminar/${id}`, { headers: getAuthHeaders() });
@@ -146,7 +147,7 @@ const handleDelete = async (id) => {
       setLoading(false);
     }
   };
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
   useEffect(() => {
     fetchDoctores();
   }, []);
@@ -163,7 +164,7 @@ const handleDelete = async (id) => {
     return { total, activos, inactivos, thisMonth };
   }, [doctores]);
 
-const filtered = useMemo(() => {                
+  const filtered = useMemo(() => {
     const q = filters.q.trim().toLowerCase();
     const est = filters.estado;
     return doctores.filter(d => {
@@ -176,60 +177,60 @@ const filtered = useMemo(() => {
 
 
 
-const columns = [
-  {
-    header: "N°",
-    key: "orden",
-    render: (_row, idx) => idx + 1
-  },
-  { accessor: "cedula", header: "Cédula", key: "cedula" },
-  { accessor: "apellido", header: "Apellido", key: "apellido" },
-  { accessor: "nombre", header: "Nombre", key: "nombre" },
-  // { accessor: "profesion_carrera", header: "Profesión", key: "profesion_carrera" },
-  // { accessor: "cargo_nombre", header: "Cargo", key: "cargo_nombre" },
-  { accessor: "contacto", header: "Contacto", key: "contacto" },
-  {
-    header: "Estado",
-    key: "estado",
-    render: (row) =>
-      row.estado === true || row.estado === "activo"
-        ? <span className="btn btn-xs badge--success">Activo</span>
-        : <span className="btn btn-xs badge--muted">Inactivo</span>
-  },
-  {
-    header: "Acciones",
-    render: (row) => (
-      <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-        <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-        <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-        <button className="btn btn-xs btn-outline btn-print">Imprimir</button>
-        <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
-      </div>
-    )
-  },
-];
+  const columns = [
+    {
+      header: "N°",
+      key: "orden",
+      render: (_row, idx) => idx + 1
+    },
+    { accessor: "cedula", header: "Cédula", key: "cedula" },
+    { accessor: "apellido", header: "Apellido", key: "apellido" },
+    { accessor: "nombre", header: "Nombre", key: "nombre" },
+    // { accessor: "profesion_carrera", header: "Profesión", key: "profesion_carrera" },
+    // { accessor: "cargo_nombre", header: "Cargo", key: "cargo_nombre" },
+    { accessor: "contacto", header: "Contacto", key: "contacto" },
+    {
+      header: "Estado",
+      key: "estado",
+      render: (row) =>
+        row.estado === true || row.estado === "activo"
+          ? <span className="btn btn-xs badge--success">Activo</span>
+          : <span className="btn btn-xs badge--muted">Inactivo</span>
+    },
+    {
+      header: "Acciones",
+      render: (row) => (
+        <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+          <button className="btn btn-xs btn-outline btn-print">Imprimir</button>
+          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+        </div>
+      )
+    },
+  ];
 
-const exportColumns = [
-  {
-    header: "N°",
-    key: "orden",
-    render: (_row, idx) => idx + 1
-  },
-  { header: "Cédula", key: "cedula" },
-  { header: "Apellido", key: "apellido" },
-  { header: "Nombre", key: "nombre" },
-  { header: "Profesión", key: "profesion_carrera" },
-  { header: "Cargo", key: "cargo_nombre" },
-  { header: "Contacto", key: "contacto" },
-  {
-    header: "Estado",
-    key: "estado",
-    render: row =>
-      row.estado === true || row.estado === "activo"
-        ? "Activo"
-        : "Inactivo"
-  }
-];
+  const exportColumns = [
+    {
+      header: "N°",
+      key: "orden",
+      render: (_row, idx) => idx + 1
+    },
+    { header: "Cédula", key: "cedula" },
+    { header: "Apellido", key: "apellido" },
+    { header: "Nombre", key: "nombre" },
+    { header: "Profesión", key: "profesion_carrera" },
+    { header: "Cargo", key: "cargo_nombre" },
+    { header: "Contacto", key: "contacto" },
+    {
+      header: "Estado",
+      key: "estado",
+      render: row =>
+        row.estado === true || row.estado === "activo"
+          ? "Activo"
+          : "Inactivo"
+    }
+  ];
 
   return (
     <div className="pac-page">
@@ -260,8 +261,8 @@ const exportColumns = [
         isOpen={confirmModal}
         onClose={closeConfirmDelete}
         onConfirm={() => {
-        handleDelete(selectedDoctor);
-        closeConfirmDelete();
+          handleDelete(selectedDoctor);
+          closeConfirmDelete();
         }}
         title="¿Confirmación de Eliminación?"
         message="¿Estás seguro de eliminar este registro?"
@@ -282,33 +283,33 @@ const exportColumns = [
       </FormModal>
 
 
-        <FormModal
-          isOpen={!!pdfUrl}
-          onClose={() => {
-            setPdfUrl(null);
-            // Limpia el objeto URL para liberar memoria
-            if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-          }}
-          title="Vista previa PDF"
-        >
-          {pdfUrl && (
-            <iframe
-              src={pdfUrl}
-              title="Vista previa PDF"
-              style={{ width: "100%", height: "70vh", border: "none" }}
-            />
-          )}
-          <div style={{ marginTop: 16, textAlign: "right" }}>
-            <a
-              href={pdfUrl}
-              download="doctores.pdf"
-              className="btn btn-primary"
-              style={{ textDecoration: "none" }}
-            >
-              Descargar PDF
-            </a>
-          </div>
-        </FormModal>
+      <FormModal
+        isOpen={!!pdfUrl}
+        onClose={() => {
+          setPdfUrl(null);
+          // Limpia el objeto URL para liberar memoria
+          if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+        }}
+        title="Vista previa PDF"
+      >
+        {pdfUrl && (
+          <iframe
+            src={pdfUrl}
+            title="Vista previa PDF"
+            style={{ width: "100%", height: "70vh", border: "none" }}
+          />
+        )}
+        <div style={{ marginTop: 16, textAlign: "right" }}>
+          <a
+            href={pdfUrl}
+            download="doctores.pdf"
+            className="btn btn-primary"
+            style={{ textDecoration: "none" }}
+          >
+            Descargar PDF
+          </a>
+        </div>
+      </FormModal>
 
       <section className="card-container">
         <Card color="#0033A0" title="Total de Doctores">
@@ -341,28 +342,28 @@ const exportColumns = [
               />
             </div>
             <div>
-                <SingleSelect
-                  options={estadoOptions}
-                  value={estadoOptions.find(opt => opt.value === filters.estado)}
-                  onChange={opt =>
-                    setFilters(f => ({ ...f, estado: opt ? opt.value : "todos" }))
-                  }
-                  isClearable={false}
-                  placeholder="Estado"
-                />
+              <SingleSelect
+                options={estadoOptions}
+                value={estadoOptions.find(opt => opt.value === filters.estado)}
+                onChange={opt =>
+                  setFilters(f => ({ ...f, estado: opt ? opt.value : "todos" }))
+                }
+                isClearable={false}
+                placeholder="Estado"
+              />
             </div>
           </div>
 
           <div className="actions">
             <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{marginRight:5}}/> PDF
+              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
             </button>
             <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{marginRight:5}} /> Excel
+              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
             </button>
-          <button className="btn btn-primary" onClick={handleNuevo}>
-            <img src={icon.user5} className="btn-icon" alt="" style={{marginRight:5}}/> Nuevo Doctor
-          </button>
+            <button className="btn btn-primary" onClick={handleNuevo}>
+              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Doctor
+            </button>
           </div>
         </div>
       </section>

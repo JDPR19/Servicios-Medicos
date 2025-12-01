@@ -1,140 +1,313 @@
-import { useMemo } from "react";
-import '../index.css'
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
+import { useToast } from "../components/userToasd";
+import Spinner from "../components/spinner";
+import { BaseUrl } from "../utils/Constans";
+import InfoModal from "../components/InfoModal";
+import ConfirmModal from "../components/ConfirmModal";
+import FormModalOne from "../components/FormModalOne";
+import FormModal from "../components/FormModal";
+import ForPacientes from "../Formularios/ForPaciente";
+import { exportToPDF, exportToExcel } from '../utils/exportUtils';
 import { useNavigate } from "react-router-dom";
-// Datos estáticos de ejemplo, reflejando los campos de la tabla SQL
-const MOCK = [
-  {
-    id: 1,
-    cedula: "V-12345678",
-    nombre: "Juan",
-    apellido: "Pérez",
-    sexo: "M",
-    fecha_nacimiento: "1990-05-12",
-    edad: "34",
-    correo: "juan.perez@yutong.com",
-    contacto: "0412-1234567",
-    codigo_territorial: "E01-M01-P01-S01",
-    ubicacion: "Galpón 2",
-    estado: "activo",
-    estado_id: 1,
-    municipio_id: 1,
-    parroquia_id: 1,
-    sector_id: 1,
-    departamentos_id: 2,
-    cargos_id: 3,
-    profesion_id: 4,
-  },
-  {
-    id: 2,
-    cedula: "V-87654321",
-    nombre: "María",
-    apellido: "Gómez",
-    sexo: "F",
-    fecha_nacimiento: "1985-11-23",
-    edad: "39",
-    correo: "maria.gomez@yutong.com",
-    contacto: "0414-7654321",
-    codigo_territorial: "E01-M02-P03-S02",
-    ubicacion: "Oficina Principal",
-    estado: "activo",
-    estado_id: 1,
-    municipio_id: 2,
-    parroquia_id: 3,
-    sector_id: 2,
-    departamentos_id: 1,
-    cargos_id: 2,
-    profesion_id: 3,
-  },
-  {
-    id: 3,
-    cedula: "E-22334455",
-    nombre: "Pedro",
-    apellido: "Ruiz",
-    sexo: "M",
-    fecha_nacimiento: "1978-02-10",
-    edad: "46",
-    correo: "pedro.ruiz@yutong.com",
-    contacto: "0424-1112233",
-    codigo_territorial: "E02-M03-P02-S03",
-    ubicacion: "Almacén",
-    estado: "activo",
-    estado_id: 2,
-    municipio_id: 3,
-    parroquia_id: 2,
-    sector_id: 3,
-    departamentos_id: 3,
-    cargos_id: 1,
-    profesion_id: 2,
-  },
-];
-
+import SingleSelect from "../components/SingleSelect";
 
 function Pacientes() {
-    const navigate = useNavigate();
-    const stats = useMemo(() => {
-      const total = MOCK.length;
-      const activos = MOCK.filter(p => p.estado === "activo").length;
-      const inactivos = MOCK.filter(p => p.estado === "inactivo").length;
-      const nuevosMes = MOCK.filter(p => (p.fechaIngreso || "").startsWith("2025-10")).length;
-      return { total, activos, inactivos, nuevosMes };
-    }, []);
+  const navigate = useNavigate();
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const showToast = useToast();
+  const [pacienteToShow, setPacienteToShow] = useState(null);
+  const [pacientes, setPacientes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({ estatus: "todos", q: "" });
+  const [selectedPaciente, setSelectedPaciente] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editPaciente, setEditPaciente] = useState(null);
 
-  const estadoBadge = (estado) =>
-    estado === "activo" ? "badge badge--success" : "badge badge--muted";
+  const getAuthHeaders = () => {
+    const token = (localStorage.getItem('token') || '').trim();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const openConfirmDelete = (id) => {
+    setSelectedPaciente(id);
+    setConfirmModal(true);
+  };
+
+  const closeConfirmDelete = () => {
+    setSelectedPaciente(null);
+    setConfirmModal(false);
+  };
+
+  const handleNuevo = () => {
+    setEditPaciente();
+    setModalOpen(true);
+  };
+
+  const handleEdit = (row) => {
+    setEditPaciente(row);
+    setModalOpen(true);
+  };
+
+  const handleSaved = () => {
+    fetchPacientes();
+    setModalOpen(false);
+    setEditPaciente(null);
+  };
+
+  const handleSeguimiento = (row) => {
+    navigate(`/admin/Seguimiento/${row.id}`);
+  };
+
+
+  const handlePreviewPDF = () => {
+    const docBlob = exportToPDF({
+      data: filtered,
+      columns: exportColumns,
+      fileName: "pacientes.pdf",
+      title: "Listado de Pacientes",
+      preview: true
+    });
+    if (docBlob) {
+      const url = URL.createObjectURL(docBlob);
+      setPdfUrl(url);
+    }
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel({
+      data: filtered,
+      columns: exportColumns,
+      fileName: "pacientes.xlsx",
+      count: true,
+      totalLabel: "TOTAL DE REGISTROS"
+    });
+  };
+
+  const estatusOptions = [
+    { value: "todos", label: "Estatus" },
+    { value: "en planta", label: "En Planta" },
+    { value: "reposo", label: "Reposo" }
+  ];
+
+  const fetchPacientes = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${BaseUrl}pacientes`, { headers: getAuthHeaders() });
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        showToast?.('Respuesta inesperada del servidor', 'error', 4000);
+        setPacientes([]);
+        return;
+      }
+      setPacientes(data);
+    } catch (error) {
+      showToast?.('Error obteniendo los datos', 'error', 3000);
+      setPacientes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleView = async (row) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BaseUrl}pacientes/${row.id}`, { headers: getAuthHeaders() });
+      setPacienteToShow(res.data);
+    } catch (error) {
+      showToast?.('No se pudo obtener la información del paciente', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${BaseUrl}pacientes/delete/${id}`, { headers: getAuthHeaders() });
+      showToast?.('Paciente eliminado con éxito', 'success', 3000);
+      await fetchPacientes();
+    } catch (error) {
+      showToast?.('Error al eliminar', 'error', 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPacientes();
+  }, []);
+
+  const stats = useMemo(() => {
+    const total = pacientes.length;
+    const enPlanta = pacientes.filter(p => p.estatus === "en planta").length;
+    const reposo = pacientes.filter(p => p.estatus === "reposo").length;
+    return { total, enPlanta, reposo };
+  }, [pacientes]);
+
+  const filtered = useMemo(() => {
+    const q = filters.q.trim().toLowerCase();
+    const est = filters.estatus;
+    return pacientes.filter(p => {
+      const matchQ = !q || `${p.cedula} ${p.nombre} ${p.apellido} ${p.contacto}`.toLowerCase().includes(q);
+      const matchEstatus = est === 'todos' ? true : p.estatus === est;
+      return matchQ && matchEstatus;
+    });
+  }, [pacientes, filters]);
 
   const columns = [
-   { accessor: "id", header: "ID", width: 50 },
-    { accessor: "cedula", header: "Cédula" },
-    { accessor: "nombre", header: "Nombre" },
-    { accessor: "apellido", header: "Apellido" },
-    { accessor: "sexo", header: "Sexo", width: 60 },
-    { accessor: "fecha_nacimiento", header: "F. Nacimiento" },
-    { accessor: "edad", header: "Edad", width: 60 },
-    // { accessor: "correo", header: "Correo" },
-    { accessor: "contacto", header: "Contacto" },
-    // { accessor: "fechaIngreso", header: "Ingreso" },
-    { accessor: "estado", header: "Estado", render: (v) => <span className={estadoBadge(v)}>{v}</span> },
-    { header: "Acciones", render: () => (
-        <div className="row-actions">
-          <button className="btn btn-xs" title="Ver">Ver</button>
-          <button className="btn btn-xs btn-warn" title="Editar">Editar</button>
-          <button className="btn btn-xs btn-outline" title="Imprimir">Imprimir</button>
-          <button className="btn btn-xs btn-outline btn-danger" title="Eliminar">Eliminar</button>
+    {
+      header: "N°",
+      key: "orden",
+      render: (_row, idx) => idx + 1
+    },
+    { accessor: "cedula", header: "Cédula", key: "cedula" },
+    { accessor: "apellido", header: "Apellido", key: "apellido" },
+    { accessor: "nombre", header: "Nombre", key: "nombre" },
+    { accessor: "contacto", header: "Contacto", key: "contacto" },
+    {
+      header: "Estatus",
+      key: "estatus",
+      render: (row) =>
+        row.estatus === "en planta"
+          ? <span className="btn btn-xs badge--success">En Planta</span>
+          : row.estatus === "reposo"
+            ? <span className="btn btn-xs badge--warning">Reposo</span>
+            : <span className="btn btn-xs badge--muted">{row.estatus}</span>
+    },
+    {
+      header: "Acciones",
+      render: (row) => (
+        <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
+          {row.has_consultas && (
+            <button
+              className="btn btn-xs btn-primary"
+              onClick={() => handleSeguimiento(row)}
+              title="Ver Seguimiento"
+              style={{ backgroundColor: '#0033a0', color: 'white' }}
+            >
+              <img src={icon.pulso2} alt="" style={{ width: 14, marginRight: 4, filter: 'brightness(0) invert(1)' }} />
+              Seguimiento
+            </button>
+          )}
+
+          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
         </div>
       )
     },
   ];
 
-  const handleFormulario = () =>{
-    console.log('handle pulsado');
-    navigate('/admin/ForPacientes');
-  };
+  const exportColumns = [
+    { header: "N°", key: "orden", render: (_row, idx) => idx + 1 },
+    { header: "Cédula", key: "cedula" },
+    { header: "Apellido", key: "apellido" },
+    { header: "Nombre", key: "nombre" },
+    { header: "Contacto", key: "contacto" },
+    { header: "Estatus", key: "estatus" }
+  ];
 
   return (
     <div className="pac-page">
+      {loading && (
+        <div className="spinner-overlay">
+          <Spinner size={50} label="Cargando Pacientes..." />
+        </div>
+      )}
+
+      <InfoModal
+        isOpen={!!pacienteToShow}
+        onClose={() => setPacienteToShow(null)}
+        title="Información del Paciente"
+      >
+        {pacienteToShow && (
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            <li><b>Cédula:</b> {pacienteToShow.cedula}</li>
+            <li><b>Nombre:</b> {pacienteToShow.nombre} {pacienteToShow.apellido}</li>
+            <li><b>Sexo:</b> {pacienteToShow.sexo}</li>
+            <li><b>Fecha Nacimiento:</b> {pacienteToShow.fecha_nacimiento}</li>
+            <li><b>Edad:</b> {pacienteToShow.edad}</li>
+            <li><b>Correo:</b> {pacienteToShow.correo}</li>
+            <li><b>Contacto:</b> {pacienteToShow.contacto}</li>
+            <li><b>Ubicación:</b> {pacienteToShow.ubicacion}</li>
+            <li><b>Estatus:</b> {pacienteToShow.estatus}</li>
+          </ul>
+        )}
+      </InfoModal>
+
+      <ConfirmModal
+        isOpen={confirmModal}
+        onClose={closeConfirmDelete}
+        onConfirm={() => {
+          handleDelete(selectedPaciente);
+          closeConfirmDelete();
+        }}
+        title="¿Confirmación de Eliminación?"
+        message="¿Estás seguro de eliminar este registro?"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
+
+      <FormModalOne
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editPaciente ? "Editar Paciente" : "Registrar Paciente"}
+      >
+        <ForPacientes
+          initialData={editPaciente}
+          onSave={handleSaved}
+          onClose={() => setModalOpen(false)}
+        />
+      </FormModalOne>
+
+      <FormModal
+        isOpen={!!pdfUrl}
+        onClose={() => {
+          setPdfUrl(null);
+          if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+        }}
+        title="Vista previa PDF"
+      >
+        {pdfUrl && (
+          <iframe
+            src={pdfUrl}
+            title="Vista previa PDF"
+            style={{ width: "100%", height: "70vh", border: "none" }}
+          />
+        )}
+        <div style={{ marginTop: 16, textAlign: "right" }}>
+          <a
+            href={pdfUrl}
+            download="pacientes.pdf"
+            className="btn btn-primary"
+            style={{ textDecoration: "none" }}
+          >
+            Descargar PDF
+          </a>
+        </div>
+      </FormModal>
+
       <section className="card-container">
-        <Card color="#0033A0" title="Total de Pacientes Registrados">
+        <Card color="#0033A0" title="Total de Pacientes">
           <img src={icon.user3} alt="" className="icon-card" />
           <span className="number">{stats.total}</span>
           <h3>Total • Pacientes</h3>
         </Card>
-        <Card color="#0B3A6A" title="Total de Pacientes Saludables">
+        <Card color="#0B3A6A" title="En Planta">
           <img src={icon.escudobien} alt="" className="icon-card" />
-          <span className="number">{stats.activos}</span>
-          <h3>Total • Saludables</h3>
+          <span className="number">{stats.enPlanta}</span>
+          <h3>Pacientes en Planta</h3>
         </Card>
-        <Card color="#CE1126" title="Total de Pacientes de Reposo">
+        <Card color="#CE1126" title="Reposo">
           <img src={icon.mascarilla} alt="" className="icon-card" />
-          <span className="number">{stats.inactivos}</span>
-          <h3>Total • Reposo</h3>
-        </Card>
-        <Card color="#FCD116" title="Total de Pacientes Atendidos en el Día">
-          <img src={icon.user5} alt="" className="icon-card" />
-          <span className="number">{stats.nuevosMes}</span>
-          <h3>Atendidos (Día)</h3>
+          <span className="number">{stats.reposo}</span>
+          <h3>Pacientes en Reposo</h3>
         </Card>
       </section>
 
@@ -142,49 +315,47 @@ function Pacientes() {
         <div className="pac-toolbar">
           <div className="filters">
             <div className="field">
-              <img src={icon.buscar || icon.calendario} alt="" className="field-icon" />
-              <input type="text" placeholder="Buscar por cédula, nombre o apellido…" />
+              <img src={icon.lupa2} alt="" className="field-icon" />
+              <input
+                type="text"
+                placeholder="Buscar por cédula, nombre, apellido o contacto…"
+                value={filters.q}
+                onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
+              />
             </div>
-            <div className="field">
-              <select defaultValue="todos">
-                <option value="todos">Todos</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-              </select>
-            </div>
-            <div className="field">
-              <select defaultValue="todos">
-                <option value="todos">Estado</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>Desde</label>
-              <input type="date" />
-            </div>
-            <div className="field">
-              <label>Hasta</label>
-              <input type="date" />
+            <div>
+              <SingleSelect
+                options={estatusOptions}
+                value={estatusOptions.find(opt => opt.value === filters.estatus)}
+                onChange={opt =>
+                  setFilters(f => ({ ...f, estatus: opt ? opt.value : "todos" }))
+                }
+                isClearable={false}
+                placeholder="Estatus"
+              />
             </div>
           </div>
 
           <div className="actions">
-            {/* <button className="btn btn-secondary">
-              <img src={icon.candado} className="btn-icon" alt="" /> Refrescar
-            </button> */}
-            <button className="btn btn-outline">
-              <img src={icon.impresora} className="btn-icon" alt="" /> Exportar
+            <button className="btn btn-secondary " onClick={handlePreviewPDF}>
+              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
             </button>
-            <button className="btn btn-primary" onClick={handleFormulario}>
-              <img src={icon.user5} className="btn-icon" alt=""  /> Nuevo paciente
+            <button className="btn btn-secondary" onClick={handleExportExcel}>
+              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
+            </button>
+            <button className="btn btn-primary" onClick={handleNuevo}>
+              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Paciente
             </button>
           </div>
         </div>
       </section>
 
       <div className="table-wrap">
-        <Tablas columns={columns} data={MOCK} rowsPerPage={5} />
+        <Tablas
+          columns={columns}
+          data={filtered}
+          rowsPerPage={8}
+        />
       </div>
     </div>
   );

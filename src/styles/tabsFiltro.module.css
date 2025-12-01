@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: flex-start;
     padding: 25px;
-    max-width: 900px;
+    max-width: 1100px;
     width: max-content;
     gap: 5px;
     border-radius: 10px;
@@ -30,13 +30,16 @@
     background: #e9ecef;
     border-radius: 8px;
 }
+
 .tabsContainer::-webkit-scrollbar-thumb {
     background: var(--light-green);
     border-radius: 8px;
 }
+
 .tabsContainer::-webkit-scrollbar-thumb:hover {
     background: var(--green-hover1);
 }
+
 .tabsContainer::-webkit-scrollbar-button {
     display: none;
     height: 0;
@@ -101,7 +104,7 @@
     box-shadow: 0 2px 8px #98c79a3a;
 }
 
-.toggleTabsButton{
+.toggleTabsButton {
     margin-bottom: 10px;
     background: var(--grey);
     color: var(--black2);
@@ -123,7 +126,8 @@
 .tabsContent {
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-    max-height: 1000px; /* suficiente para el contenido */
+    max-height: 1000px;
+    /* suficiente para el contenido */
     opacity: 1;
 }
 
@@ -132,4 +136,3 @@
     opacity: 0;
     pointer-events: none;
 }
-

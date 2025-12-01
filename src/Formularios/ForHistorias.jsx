@@ -1,248 +1,271 @@
 import React, { useState, useEffect } from "react";
-import icon from "../components/icon";
+import axios from "axios";
+import { BaseUrl } from "../utils/Constans";
+import { useToast } from "../components/userToasd";
+import Spinner from "../components/spinner";
+import MultiSelect from "../components/MultiSelect";
+import { jwtDecode } from "jwt-decode";
 import "../index.css";
-import { useNavigate } from "react-router-dom";
 
-// Simulación de catálogos (puedes reemplazar por fetch real)
-const fetchPacientes = async () => [
-  { id: 1, nombre: "Juan Pérez" },
-  { id: 2, nombre: "María Gómez" },
-  { id: 3, nombre: "Pedro Ruiz" },
-];
-const fetchUsuarios = async () => [
-  { id: 1, nombre: "Dr. Salas" },
-  { id: 2, nombre: "Dra. López" },
-];
-const fetchEnfermedades = async () => [
-  { id: 1, nombre: "Migraña" },
-  { id: 2, nombre: "Hipertensión" },
-  { id: 3, nombre: "Gastritis" },
-  { id: 4, nombre: "Cuadro viral" },
-];
+function ForHistorias({ pacienteId, onSuccess, onCancel, historiaToEdit = null }) {
+  const showToast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [enfermedadesOptions, setEnfermedadesOptions] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
 
-function ForHistorias({ initialData = {}, onSave }) {
-  const navigate = useNavigate();
-  const initialForm = {
-    codigo: "",
-    fecha_consulta: "",
+  const [formData, setFormData] = useState({
+    fecha_consulta: new Date().toISOString().split('T')[0],
     fecha_alta: "",
     motivo_consulta: "",
     historia: "",
     examen_fisico: "",
     diagnostico: "",
     observacion: "",
-    pacientes_id: "",
-    usuarios_id: "",
-    estado: true,
-    enfermedades: [], // array de ids
-  };
+    enfermedades_ids: [] // Array de objetos { label, value } para el select
+  });
 
-  const [form, setForm] = useState({ ...initialForm, ...initialData });
-  const [pacientes, setPacientes] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [enfermedades, setEnfermedades] = useState([]);
-
+  // Cargar catálogo de enfermedades y datos de la historia si se está editando
   useEffect(() => {
-    setForm((f) => ({ ...f, ...initialData }));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-  useEffect(() => {
-    fetchPacientes().then(setPacientes);
-    fetchUsuarios().then(setUsuarios);
-    fetchEnfermedades().then(setEnfermedades);
-  }, []);
+        // 1. Cargar catálogo de enfermedades
+        const enfResponse = await axios.get(`${BaseUrl}historias_medicas/enfermedades`, { headers });
+        const options = (enfResponse.data || []).map(e => ({
+          value: e.id,
+          label: e.nombre
+        }));
+        setEnfermedadesOptions(options);
+
+        // 2. Si estamos editando, cargar datos completos de la historia
+        if (historiaToEdit) {
+          let historiaCompleta = historiaToEdit;
+
+          // Si no tiene detalle (enfermedades), hacemos fetch para obtenerlo
+          if (!historiaToEdit.detalle) {
+            try {
+              const fullHistResponse = await axios.get(`${BaseUrl}historias_medicas/ver/${historiaToEdit.id}`, { headers });
+              historiaCompleta = fullHistResponse.data;
+            } catch (err) {
+              console.error("Error al cargar detalle de historia:", err);
+              // Si falla, seguimos con lo que tenemos, aunque falten enfermedades
+            }
+          }
+
+          setFormData({
+            fecha_consulta: historiaCompleta.fecha_consulta ? historiaCompleta.fecha_consulta.split('T')[0] : "",
+            fecha_alta: historiaCompleta.fecha_alta ? historiaCompleta.fecha_alta.split('T')[0] : "",
+            motivo_consulta: historiaCompleta.motivo_consulta || "",
+            historia: historiaCompleta.historia || "",
+            examen_fisico: historiaCompleta.examen_fisico || "",
+            diagnostico: historiaCompleta.diagnostico || "",
+            observacion: historiaCompleta.observacion || "",
+            enfermedades_ids: []
+          });
+
+          // Mapear enfermedades si existen en el detalle
+          if (historiaCompleta.detalle && Array.isArray(historiaCompleta.detalle)) {
+            const selectedEnfs = historiaCompleta.detalle.map(d => ({
+              value: d.enfermedad_id,
+              label: d.enfermedad_nombre
+            }));
+            setFormData(prev => ({ ...prev, enfermedades_ids: selectedEnfs }));
+          }
+        }
+
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+        showToast?.("Error al cargar catálogos", "error");
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, [historiaToEdit]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value
     }));
   };
 
-  const handleEnfermedadToggle = (id) => {
-    setForm((prev) => ({
-      ...prev,
-      enfermedades: prev.enfermedades.includes(id)
-        ? prev.enfermedades.filter((eid) => eid !== id)
-        : [...prev.enfermedades, id],
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSave) onSave(form);
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      // Obtener ID de usuario del token
+      let usuarios_id = null;
+      if (token) {
+        const decoded = jwtDecode(token);
+        usuarios_id = decoded.id;
+      }
+
+      // Preparar enfermedades en el formato que espera el backend: [{ enfermedad_id: 1 }, ...]
+      const enfermedadesParaEnviar = formData.enfermedades_ids.map(item => ({
+        enfermedad_id: item.value
+      }));
+
+      const dataToSend = {
+        ...formData,
+        pacientes_id: parseInt(pacienteId),
+        usuarios_id: usuarios_id,
+        enfermedades_ids: enfermedadesParaEnviar,
+        // Asegurar fechas nulas si están vacías
+        fecha_alta: formData.fecha_alta || null
+      };
+
+      if (historiaToEdit) {
+        await axios.put(`${BaseUrl}historias_medicas/actualizar/${historiaToEdit.id}`, dataToSend, { headers });
+        showToast?.("Historia médica actualizada correctamente", "success");
+      } else {
+        await axios.post(`${BaseUrl}historias_medicas/registrar`, dataToSend, { headers });
+        showToast?.("Historia médica registrada correctamente", "success");
+      }
+
+      onSuccess?.();
+    } catch (error) {
+      console.error("Error al guardar historia:", error);
+      showToast?.(error.response?.data?.message || "Error al guardar la historia médica", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancel = () => {
-    navigate('/admin/Historias');
-  };
-
-  const handleClear = () => {
-    setForm(initialForm);
-  };
+  if (loadingData) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
+        <Spinner size={40} label="Cargando datos..." />
+      </div>
+    );
+  }
 
   return (
-    <form className="forc-page" onSubmit={handleSubmit}>
-      <div className="forc-section-title">
-        <img src={icon.folder || icon.user} alt="" className="icon" />
-        <span>Historia Médica</span>
-      </div>
-      <div className="forc-grid">
+    <form onSubmit={handleSubmit}>
+      <div className="forc-section-title"></div>
+
+      <div className="forc-grid cols-2">
+        {/* Fecha Consulta */}
         <div className="fc-field">
-          <label>Código</label>
-          <input
-            name="codigo"
-            value={form.codigo}
-            onChange={handleChange}
-            placeholder="Se genera automáticamente"
-            disabled
-          />
-        </div>
-        <div className="fc-field">
-          <label>Fecha de Consulta</label>
+          <label><span className="unique">*</span>Fecha Consulta</label>
           <input
             type="date"
             name="fecha_consulta"
-            value={form.fecha_consulta}
+            value={formData.fecha_consulta}
             onChange={handleChange}
             required
           />
         </div>
+
+        {/* Fecha Alta */}
         <div className="fc-field">
-          <label>Fecha de Alta</label>
+          <label>Fecha Alta</label>
           <input
             type="date"
             name="fecha_alta"
-            value={form.fecha_alta}
+            value={formData.fecha_alta}
             onChange={handleChange}
           />
         </div>
-        <div className="fc-field">
-          <label>Paciente</label>
-          <select
-            name="pacientes_id"
-            value={form.pacientes_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {pacientes.map((p) => (
-              <option key={p.id} value={p.id}>{p.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Médico</label>
-          <select
-            name="usuarios_id"
-            value={form.usuarios_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {usuarios.map((u) => (
-              <option key={u.id} value={u.id}>{u.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Motivo de Consulta</label>
-          <input
-            name="motivo_consulta"
-            value={form.motivo_consulta}
-            onChange={handleChange}
-            placeholder="Motivo principal"
-            required
-          />
-        </div>
-      </div>
 
-      <div className="forc-section-title">
-        <img src={icon.doctor} alt="" />
-        <span>Detalles Clínicos</span>
-      </div>
-      <div className="forc-grid cols-1">
-        <div className="fc-field">
-          <label>Historia</label>
+        {/* Motivo Consulta - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+          <label><span className="unique">*</span>Motivo de Consulta</label>
+          <input
+            type="text"
+            name="motivo_consulta"
+            value={formData.motivo_consulta}
+            onChange={handleChange}
+            placeholder="Ej: Dolor de cabeza persistente"
+            required
+          />
+        </div>
+
+        {/* Historia - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+          <label>Historia Clínica</label>
           <textarea
             name="historia"
-            rows={2}
-            value={form.historia}
+            value={formData.historia}
             onChange={handleChange}
-            placeholder="Historia clínica detallada"
-            required
+            rows="3"
+            placeholder="Detalle de la historia clínica..."
           />
         </div>
-        <div className="fc-field">
+
+        {/* Examen Físico - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
           <label>Examen Físico</label>
           <textarea
             name="examen_fisico"
-            rows={2}
-            value={form.examen_fisico}
+            value={formData.examen_fisico}
             onChange={handleChange}
-            placeholder="Examen físico realizado"
+            rows="3"
+            placeholder="Hallazgos del examen físico..."
           />
         </div>
-        <div className="fc-field">
+
+        {/* Diagnóstico - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
           <label>Diagnóstico</label>
           <textarea
             name="diagnostico"
-            rows={2}
-            value={form.diagnostico}
+            value={formData.diagnostico}
             onChange={handleChange}
-            placeholder="Diagnóstico médico"
-            required
+            rows="2"
+            placeholder="Diagnóstico presuntivo o definitivo..."
           />
         </div>
-        <div className="fc-field">
-          <label>Observación</label>
+
+        {/* Observación - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+          <label>Observaciones</label>
           <textarea
             name="observacion"
-            rows={2}
-            value={form.observacion}
+            value={formData.observacion}
             onChange={handleChange}
-            placeholder="Observaciones adicionales"
+            rows="2"
+            placeholder="Observaciones adicionales..."
+          />
+        </div>
+
+        {/* Enfermedades Relacionadas - Full Width */}
+        <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+          <label>Enfermedades Relacionadas</label>
+          <MultiSelect
+            options={enfermedadesOptions}
+            value={formData.enfermedades_ids}
+            onChange={(selected) => setFormData(prev => ({ ...prev, enfermedades_ids: selected || [] }))}
+            placeholder="Seleccione enfermedades..."
           />
         </div>
       </div>
 
-      <div className="forc-section-title">
-        <img src={icon.monitorcardiaco} alt="" />
-        <span>Enfermedades Relacionadas</span>
-      </div>
-      <div className="forc-grid cols-1">
-        <div className="fc-field">
-          <label>Seleccione una o varias enfermedades</label>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-            {enfermedades.map((e) => (
-              <label key={e.id} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <input
-                  type="checkbox"
-                  checked={form.enfermedades.includes(e.id)}
-                  onChange={() => handleEnfermedadToggle(e.id)}
-                />
-                {e.nombre}
-              </label>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="forc-actions">
-        <button className="btn btn-outline" type="button" onClick={handleCancel}>
-          Cancelar y Regresar
+      {/* Botones */}
+      <div className="forc-actions" style={{ marginTop: 30, marginBottom: 20 }}>
+        <button
+          type="button"
+          className="btn btn-outline"
+          onClick={onCancel}
+          disabled={loading}
+        >
+          Cancelar
         </button>
         <div className="forc-actions-right">
           <button
-            className="btn btn-secondary"
-            type="button"
-            onClick={handleClear}
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading}
           >
-            Limpiar
-          </button>
-          <button className="btn btn-primary" type="submit">
-            Guardar
+            {loading ? <Spinner size={20} /> : historiaToEdit ? "Actualizar" : "Registrar"}
           </button>
         </div>
       </div>

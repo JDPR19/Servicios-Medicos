@@ -1,41 +1,40 @@
-
 .card {
     background: var(--azul-texto);
     border-radius: 10px;
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
     max-width: 250px;
-    font-family: 'Roboto',sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    /* transform: translateY(-5px); */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-.card-container{
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  position: relative;
-  margin-top: 10px;
-  margin-bottom: 10px;
+.card-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-.number{
-  font-size: 3rem;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 900;
-  color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-right: 20px;
+.number {
+    font-size: 3rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 20px;
 }
 
-.icon-card{
+.icon-card {
     width: 50px;
     height: 50px;
     display: flex;
@@ -69,7 +68,8 @@
 }
 
 .card-avatar {
-    width: 80px; height: 80px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 1rem;
@@ -91,7 +91,7 @@
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     max-width: 320px;
     cursor: pointer;
@@ -101,7 +101,7 @@
 
 .advanced-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Imagen */
@@ -160,7 +160,7 @@
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     max-width: 700px;
     cursor: pointer;
@@ -168,7 +168,7 @@
 
 .blog-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Imagen lateral */
@@ -226,7 +226,7 @@
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     max-width: 260px;
     display: flex;
@@ -236,7 +236,7 @@
 
 .grid-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Imagen */

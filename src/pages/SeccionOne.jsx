@@ -7,10 +7,7 @@ import Doctores from "../pages/Doctores";
 import Cargos from '../pages/Cargos';
 import Roles from '../pages/Roles';
 import Usuarios from '../pages/Usuarios';
-import Departamentos from "./Departamentos";
-import Finalidades from './Finalidades';
-import Categoria_m from './Categoria_m';
-import Categoria_e from './Categoria_e';
+
 
 function SeccionOne() {
   const tienePermiso = usePermiso();
@@ -22,10 +19,7 @@ function SeccionOne() {
       tienePermiso("usuarios", "ver") && { key: "usuarios", label: "Usuarios" },
       tienePermiso("cargos", "ver") && { key: "cargos", label: "Cargos" },
       tienePermiso("roles", "ver") && { key: "roles", label: "Seguridad y Roles" },
-      tienePermiso("departamentos", "ver") && { key: "departamentos", label: "Departamentos" },
-      tienePermiso("finalidades", "ver") && { key: "finalidades", label: "finalidades" },
-      tienePermiso("categoria_m", "ver") && { key: "categoria_m", label: "Categoria Medicamentos" },
-      tienePermiso("categoria_e", "ver") && { key: "categoria_e", label: "Categoria Patologias" },
+      
     ].filter(Boolean);
     // Si no hay tabs válidas, evita el error y muestra uno neutro
     return t.length ? t : [{ key: "no-access", label: "Sin acceso" }];
@@ -67,14 +61,6 @@ function SeccionOne() {
     tablaRenderizada = <Roles/>;
   }else if (activeTab === "usuarios" && tabs.some(t => t.key === "usuarios")) {
     tablaRenderizada = <Usuarios/>;
-  }else if (activeTab === "departamentos" && tabs.some(t => t.key === "departamentos" )) {
-    tablaRenderizada = <Departamentos/>;
-  }else if (activeTab === "finalidades" && tabs.some(t => t.key === "finalidades")) {
-      tablaRenderizada = <Finalidades/>;
-  }else if (activeTab === "categoria_e" && tabs.some(t => t.key === "categoria_e")) {
-    tablaRenderizada = <Categoria_e/>;
-  }else if (activeTab === "categoria_m" && tabs.some(t => t.key === "categoria_m")) {
-    tablaRenderizada = <Categoria_m/>;
   }
   if (activeTab === "no-access") {
     tablaRenderizada = (

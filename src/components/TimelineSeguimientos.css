@@ -1,0 +1,193 @@
+/* TimelineSeguimientos.css */
+
+.timeline-container {
+    width: 100%;
+    padding: 20px 0;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.timeline-header h3 {
+    margin: 0;
+    color: #0033a0;
+    font-size: 20px;
+}
+
+.timeline-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.timeline-empty p {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 50px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #3b82f6, #e5e7eb);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 4px white, 0 0 0 6px currentColor;
+    z-index: 2;
+}
+
+.timeline-number {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.timeline-content {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.timeline-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.timeline-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.timeline-card-header h4 {
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+    font-size: 18px;
+}
+
+.timeline-date {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.timeline-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.timeline-card-body {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.timeline-section {
+    margin-bottom: 15px;
+}
+
+.timeline-section strong {
+    display: block;
+    color: #374151;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.timeline-section p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.timeline-actions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timeline {
+        padding-left: 30px;
+    }
+
+    .timeline::before {
+        left: 10px;
+    }
+
+    .timeline-marker {
+        left: -20px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .timeline-number {
+        font-size: 12px;
+    }
+
+    .timeline-card-header {
+        flex-direction: column;
+    }
+
+    .timeline-badge {
+        align-self: flex-start;
+    }
+}

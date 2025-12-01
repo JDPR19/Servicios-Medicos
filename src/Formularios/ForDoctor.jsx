@@ -184,7 +184,7 @@ return (
     <div className="forc-section-title">
     </div>
     <div className="forc-grid">
-    <div className="fc-field">
+<div className="fc-field">
         <label><span className="unique">*</span>Cédula</label>
         <div style={{ display: "flex", gap: 8 }}>
             <SingleSelect
@@ -193,7 +193,7 @@ return (
             onChange={handlePrefijoChange}
             placeholder="Prefijo"
             isClearable={false}
-            />
+            />    
             <input
             name="cedula"
             value={numeroCedula}

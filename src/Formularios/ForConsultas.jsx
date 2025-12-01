@@ -1,315 +1,359 @@
-import React, { useState, useEffect } from "react";
-import icon from "../components/icon";
+import React, { useEffect, useState } from "react";
 import "../index.css";
-import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { BaseUrl } from "../utils/Constans";
+import Spinner from "../components/spinner";
+import { useToast } from "../components/userToasd";
+import SingleSelect from "../components/SingleSelect";
+import { validateField, getValidationRule } from "../utils/validation";
+import FormModalOne from "../components/FormModalOne";
+import ForPacientes from "./ForPaciente";
+import icon from "../components/icon";
+import { useNavigate } from "react-router-dom";
 
-const fetchEnfermedades = async () => [
-  { id: 1, nombre: "Hipertensión" },
-  { id: 2, nombre: "Diabetes" },
-];
-const fetchHistorias = async () => [
-  { id: 1, paciente: "Juan Pérez" },
-  {  id: 2, paciente: "María Gómez" },
-];
-const fetchMedicamentos = async () => [
-  { id: 1, nombre: "Paracetamol" },
-  { id: 2, nombre: "Ibuprofeno" },
-  { id: 3, nombre: "Acetaminofen" },
-  { id: 4, nombre: "Loratadina" },
-  { id: 5, nombre: "Atamel" },
-  { id: 6, nombre: "Tachipirin" },
-];
 
-const fetchPresentacion = async () => [
-  {id: 1,presentacion: "Unidades"},
-  {id: 2,presentacion: "Tabletas"},
-  {id: 3,presentacion: "Caja"},
-  {id: 4,presentacion: "Ampoya"},
-  // {id: 5,presentacion: "Tabletas"},
-];
-
-function ForConsultas({ initialData = {}, onSave}) {
+function ForConsultas({ initialData = {}, onSave, onClose }) {
+  const showToast = useToast();
+  const isEdit = !!initialData?.id;
   const navigate = useNavigate();
+
   const initialForm = {
-    codigo: "",
-    fecha_atencion: "",
     diagnostico: "",
     tratamientos: "",
     observaciones: "",
-    estado: true,
-    historias_medicas_id: "",
-    enfermedades_id: "",
-    medicamentos: [],
+    estatus: "Realizada",
+    pacientes_id: null,
+    enfermedades_id: null,
+    medicamentos_ids: [],
+    ...initialData,
   };
 
-  const [form, setForm] = useState({
-    ...initialForm,
-    ...initialData,
-  });
-
+  const [form, setForm] = useState(initialForm);
+  const [errors, setErrors] = useState({});
+  const [pacientes, setPacientes] = useState([]);
   const [enfermedades, setEnfermedades] = useState([]);
-  const [historias, setHistorias] = useState([]);
   const [medicamentos, setMedicamentos] = useState([]);
-  const [presentacion, setPresentacion] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showPacienteModal, setShowPacienteModal] = useState(false);
 
-  // Para agregar medicamentos a la consulta
-  const [medicamentoSel, setMedicamentoSel] = useState("");
-  const [cantidadSel, setCantidadSel] = useState("");
-  const [medicamentoPre, setMedicamentoPre] = useState("");
-
+  // Cargar catálogos
   useEffect(() => {
-    setForm((f) => ({ ...f, ...initialData }));
+    const fetchCatalogos = async () => {
+      setLoading(true);
+      try {
+        const token = (localStorage.getItem('token') || '').trim();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const [pacRes, enfRes, medRes] = await Promise.all([
+          axios.get(`${BaseUrl}consultas/pacientes`, { headers }),
+          axios.get(`${BaseUrl}consultas/enfermedades`, { headers }),
+          axios.get(`${BaseUrl}consultas/medicamentos`, { headers }),
+        ]);
+        setPacientes(pacRes.data);
+        setEnfermedades(enfRes.data);
+        setMedicamentos(medRes.data);
+      } catch (error) {
+        showToast?.("Error cargando catálogos", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCatalogos();
   }, []);
 
   useEffect(() => {
-    fetchEnfermedades().then(setEnfermedades);
-    fetchHistorias().then(setHistorias);
-    fetchMedicamentos().then(setMedicamentos);
-    fetchPresentacion().then(setPresentacion);
+    setForm({ ...initialForm, ...initialData });
   }, []);
+
+  const handleSeguimientos = () => {
+    navigate('/admin/Seguimiento/' + form.pacientes_id)
+  }
+
+  const validate = (field, value) => {
+    if (!value && ["diagnostico", "pacientes_id", "enfermedades_id"].includes(field)) {
+      return "Este campo es obligatorio";
+    }
+    const rule = getValidationRule(field);
+    if (rule && rule.regex) {
+      const result = validateField(value, { text: v => rule.regex.test(v) }, rule.errorMessage);
+      return result.valid ? "" : result.message;
+    }
+    return "";
+  };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: validate(name, value),
+    }));
+  };
+
+  const handleSelectChange = (name, opt) => {
+    setForm((prev) => ({
+      ...prev,
+      [name]: opt ? opt.value : null,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: validate(name, opt ? opt.value : null),
+    }));
+  };
+
+  const handleMedicamentosChange = (idx, field, value) => {
+    setForm((prev) => {
+      const meds = [...(prev.medicamentos_ids || [])];
+      meds[idx][field] = value;
+      return { ...prev, medicamentos_ids: meds };
+    });
   };
 
   const handleAddMedicamento = () => {
-    if (
-      medicamentoSel &&
-      cantidadSel &&
-      !form.medicamentos.some((m) => m.medicamento_id === medicamentoSel)
-    ) {
-      setForm((prev) => ({
-        ...prev,
-        medicamentos: [
-          ...prev.medicamentos,
-          { medicamento_id: medicamentoSel, cantidad_utilizada: cantidadSel },
-        ],
-      }));
-      setMedicamentoSel("");
-      setCantidadSel("");
-    }
-  };
-
-  const handleRemoveMedicamento = (id) => {
     setForm((prev) => ({
       ...prev,
-      medicamentos: prev.medicamentos.filter((m) => m.medicamento_id !== id),
+      medicamentos_ids: [...(prev.medicamentos_ids || []), { medicamento_id: null, cantidad_utilizada: 1 }],
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleRemoveMedicamento = (idx) => {
+    setForm((prev) => {
+      const meds = [...(prev.medicamentos_ids || [])];
+      meds.splice(idx, 1);
+      return { ...prev, medicamentos_ids: meds };
+    });
+  };
+
+
+  const validateAll = () => {
+    const newErrors = {};
+    ["diagnostico", "pacientes_id", "enfermedades_id"].forEach((field) => {
+      const err = validate(field, form[field]);
+      if (err) newErrors[field] = err;
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSave) onSave(form);
+    if (!validateAll()) {
+      showToast?.("Corrige los errores antes de guardar", "warning");
+      return;
+    }
+    setLoading(true);
+    try {
+      const token = (localStorage.getItem('token') || '').trim();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      if (isEdit) {
+        await axios.put(`${BaseUrl}consultas/actualizar/${initialData.id}`, form, { headers });
+        showToast?.("Consulta actualizada correctamente", "success");
+      } else {
+        await axios.post(`${BaseUrl}consultas/registrar`, form, { headers });
+        showToast?.("Consulta registrada correctamente", "success");
+      }
+
+      if (onSave) onSave();
+      if (onClose) onClose();
+      handleSeguimientos();
+
+
+    } catch (err) {
+      console.error("Error submit:", err);
+      const msg = err?.response?.data?.message || "Error procesando la solicitud";
+      showToast?.(msg, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancel = () => {
-    console.log("Cancel pressed");
-    navigate('/admin/Consultas');
+  const handleClear = () => {
+    setForm(initialForm);
+    setErrors({});
   };
 
-  const handleSave = () => {
-    console.log('registro guardado y boton pulsado.... redireccionando');
-    navigate('/admin/Seguimiento');
+  const handlePacienteSaved = (nuevoPaciente) => {
+    setShowPacienteModal(false);
+    // Refresca la lista de pacientes y selecciona el nuevo
+    setPacientes(prev => [nuevoPaciente, ...prev]);
+    setForm(f => ({ ...f, pacientes_id: nuevoPaciente.id }));
+    showToast?.("Paciente registrado y seleccionado", "success");
   };
 
   return (
-    <form className="forc-page" onSubmit={handleSubmit}>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="forc-section-title"></div>
+        <div className="forc-grid">
+          <div className="fc-field">
+            <label>
+              <span className="unique">*</span>Paciente
+              <div style={{ float: "right" }} >
+                <button
+                  type="button"
+                  className="btn btn-xs btn-slider"
+                  style={{ marginLeft: 8, verticalAlign: "middle" }}
+                  title="Registrar nuevo paciente"
+                  onClick={() => setShowPacienteModal(true)}
+                >
+                  <img src={icon.user4} alt="Nuevo paciente" style={{ width: 18, verticalAlign: "middle" }} />
+                  <span style={{ marginLeft: 4 }}>Afiliar</span>
+                </button>
+              </div>
+            </label>
+            <SingleSelect
+              options={pacientes.map(p => ({
+                value: p.id,
+                label: `${p.cedula} - ${p.nombre} ${p.apellido}`
+              }))}
+              value={pacientes.find(p => p.id === form.pacientes_id) ? {
+                value: form.pacientes_id,
+                label: pacientes.find(p => p.id === form.pacientes_id)?.nombre
+                  ? `${pacientes.find(p => p.id === form.pacientes_id).cedula} - ${pacientes.find(p => p.id === form.pacientes_id).nombre} ${pacientes.find(p => p.id === form.pacientes_id).apellido}`
+                  : ""
+              } : null}
+              onChange={opt => handleSelectChange("pacientes_id", opt)}
+              placeholder="Seleccione…"
+              isClearable={false}
+            />
+            {errors.pacientes_id && <span style={{ color: "red" }}>{errors.pacientes_id}</span>}
+          </div>
+          <div className="fc-field">
+            <label><span className="unique">*</span>Enfermedad</label>
+            <SingleSelect
+              options={enfermedades.map(e => ({ value: e.id, label: e.nombre }))}
+              value={enfermedades.find(e => e.id === form.enfermedades_id) ? {
+                value: form.enfermedades_id,
+                label: enfermedades.find(e => e.id === form.enfermedades_id)?.nombre
+              } : null}
+              onChange={opt => handleSelectChange("enfermedades_id", opt)}
+              placeholder="Seleccione…"
+              isClearable={false}
+            />
+            {errors.enfermedades_id && <span style={{ color: "red" }}>{errors.enfermedades_id}</span>}
+          </div>
+          <div className="fc-field">
+            <label><span className="unique">*</span>Diagnóstico</label>
+            <textarea
+              name="diagnostico"
+              value={form.diagnostico}
+              onChange={handleChange}
+              placeholder="Diagnóstico"
+              required
+              rows={2}
+            />
+            {errors.diagnostico && <span style={{ color: "red" }}>{errors.diagnostico}</span>}
+          </div>
+          <div className="fc-field">
+            <label>Tratamientos</label>
+            <textarea
+              name="tratamientos"
+              value={form.tratamientos}
+              onChange={handleChange}
+              placeholder="Tratamientos"
+              rows={2}
+            />
+          </div>
+          <div className="fc-field">
+            <label>Observaciones</label>
+            <textarea
+              name="observaciones"
+              value={form.observaciones}
+              onChange={handleChange}
+              placeholder="Observaciones"
+              rows={2}
+            />
+          </div>
+          <div className="fc-field" >
+            <label>Medicamentos</label>
+            <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "flex-end", position: "relative", top: -30 }}>
+              <button type="button" className="btn btn-xs btn-secondary" onClick={handleAddMedicamento} style={{}} >Agregar Medicamento</button>
+            </div>
+            <div style={{
+              maxHeight: 100, overflow: "auto", paddingRight: "5"
+            }}>
 
-      <div className="forc-section-title">
-        <img src={icon.user4 || icon.user} alt="" />
-        <span>Datos del Paciente a Consultar</span>
-      </div>
-      <div className="forc-grid">
-        <div className="fc-field">
-          <label>Código</label>
-          <input
-            name="codigo"
-            value={form.codigo}
-            onChange={handleChange}
-            placeholder="Ej: CON-001"
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Fecha de atención</label>
-          <input
-            type="datetime-local"
-            name="fecha_atencion"
-            value={form.fecha_atencion}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Historia médica</label>
-          <select
-            name="historias_medicas_id"
-            value={form.historias_medicas_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {historias.map((h) => (
-              <option key={h.id} value={h.id}>
-                {h.paciente} 
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Enfermedad</label>
-          <select
-            name="enfermedades_id"
-            value={form.enfermedades_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {enfermedades.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+              {(form.medicamentos_ids || []).map((med, idx) => (
+                <div key={idx} style={{ display: "flex", width: "100%", gap: 20, marginBottom: 8 }}>
+                  <SingleSelect
+                    options={medicamentos.map(m => ({
+                      value: m.id,
+                      label: `${m.nombre} - ${m.presentacion}`
+                    }))}
 
-      <div className="forc-section-title">
-        <img src={icon.doctor} alt="" />
-        <span>Diagnóstico y tratamiento</span>
-      </div>
-      <div className="forc-grid cols-1">
-        <div className="fc-field">
-          <label>Diagnóstico</label>
-          <textarea
-            name="diagnostico"
-            rows={2}
-            value={form.diagnostico}
-            onChange={handleChange}
-            placeholder="Diagnostico del Paciente"
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Tratamientos</label>
-          <textarea
-            name="tratamientos"
-            rows={2}
-            value={form.tratamientos}
-            onChange={handleChange}
-            placeholder="Detalle de tratamientos"
-          />
-        </div>
-        <div className="fc-field">
-          <label>Observaciones</label>
-          <textarea
-            name="observaciones"
-            rows={2}
-            value={form.observaciones}
-            onChange={handleChange}
-            placeholder="Observaciones adicionales"
-          />
-        </div>
-      </div>
+                    value={medicamentos.find(m => m.id === med.medicamento_id) ? {
+                      value: med.medicamento_id,
+                      label: (() => {
+                        const m = medicamentos.find(m => m.id === med.medicamento_id);
+                        return m ? `${m.nombre} - ${m.presentacion}` : "";
+                      })()
+                    } : null}
 
-      <div className="forc-section-title">
-        <img src={icon.monitorcardiaco} alt="" />
-        <span>Medicamentos utilizados</span>
-      </div>
-      <div className="forc-grid">
-        <div className="fc-field">
-          <label>Medicamento</label>
-          <select
-            value={medicamentoSel}
-            onChange={(e) => setMedicamentoSel(e.target.value)}
-          >
-            <option value="">Seleccione…</option>
-            {medicamentos.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre}
-              </option>
-            ))}
-          </select>
+                    onChange={opt => handleMedicamentosChange(idx, "medicamento_id", opt ? opt.value : null)}
+                    placeholder="Medicamento"
+                    isClearable={false}
+                    style={{ width: "-100%" }}
+                  />
+                  <input
+                    type="number"
+                    min={1}
+                    name="cantidad_utilizada"
+                    value={med.cantidad_utilizada}
+                    onChange={e => handleMedicamentosChange(idx, "cantidad_utilizada", e.target.value)}
+                    placeholder="Cantidad"
+                    style={{ width: "50%" }}
+                  />
+
+                  <button type="button" className="btn btn-xs btn-danger" onClick={() => handleRemoveMedicamento(idx)} style={{ marginLeft: 5, width: "15%", justifyContent: "center" }} >Quitar</button>
+                </div>
+              ))
+              }
+            </div>
+
+          </div>
+          <div className="fc-field">
+            <label>Estatus</label>
+            <SingleSelect
+              options={[
+                { value: "Realizada", label: "Realizada" },
+                { value: "Pendiente", label: "Pendiente" }
+              ]}
+              value={{ value: form.estatus, label: form.estatus }}
+              onChange={opt => setForm(f => ({ ...f, estatus: opt.value }))}
+              isClearable={false}
+            />
+          </div>
         </div>
-        <div className="fc-field">
-          <label>Presentación</label>
-          <select
-            value={medicamentoPre}
-            onChange={(e) => setMedicamentoPre(e.target.value)}
-          >
-            <option value="">Seleccione…</option>
-            {presentacion.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.presentacion}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Cantidad utilizada</label>
-          <input
-            type="number"
-            min={1}
-            value={cantidadSel}
-            onChange={(e) => setCantidadSel(e.target.value)}
-            placeholder="Cantidad"
-          />
-        </div>
-        
-        <div className="fc-field" style={{ alignSelf: "end" }}>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleAddMedicamento}
-          >
-            Agregar
+        <div className="forc-actions" style={{ marginTop: 30, marginBottom: 20 }}>
+          <button className="btn btn-outline" type="button" onClick={onClose} disabled={loading}>
+            Cancelar
           </button>
+          <div className="forc-actions-right">
+            <button className="btn btn-secondary" type="button" onClick={handleClear} disabled={loading}>
+              Limpiar
+            </button>
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading ? <Spinner size={10} inline label="Procesando..." /> : "Guardar"}
+            </button>
+          </div>
         </div>
-      </div>
-      {form.medicamentos.length > 0 && (
-        <div className="fc-field">
-          <ul>
-            {form.medicamentos.map((m, idx) => {
-              const med = medicamentos.find((med) => med.id === Number(m.medicamento_id));
-              return (
-                <li key={idx}>
-                  {med ? med.nombre : "Medicamento"} - {m.cantidad_utilizada}{" "}
-                  <button
-                    type="button"
-                    className="btn btn-xs btn-outline"
-                    onClick={() => handleRemoveMedicamento(m.medicamento_id)}
-                  >
-                    Quitar
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+      </form >
 
-      <div className="forc-actions">
-        <button className="btn btn-outline" type="button" onClick={handleCancel}>
-          Cancelar y Regresar
-        </button>
-        <div className="forc-actions-right">
-        <button
-          className="btn btn-secondary"
-          type="button"
-          onClick={() => setForm(initialForm)}
-        >
-        Limpiar
-      </button>
-          <button className="btn btn-primary" type="button" onClick={handleSave}>
-            Guardar
-          </button>
-        </div>
-      </div>
-    </form>
+
+      <FormModalOne
+        isOpen={showPacienteModal}
+        onClose={() => setShowPacienteModal(false)}
+        title="Registrar Paciente Afiliado"
+      >
+        <ForPacientes
+          onSave={handlePacienteSaved}
+          onClose={() => setShowPacienteModal(false)}
+        />
+      </FormModalOne>
+    </>
   );
 }
 

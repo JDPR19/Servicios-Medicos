@@ -145,8 +145,8 @@ function Medicamentos() {
       render: (row) => {
         const mapClass = {
           disponible: "badge--success",
-          "por acabar": "badge--warning",
-          agotado: "badge--danger"
+          "por acabar": "badge--warn",
+          agotado: "badge--drop"
         }[row.estatus] || "badge--muted";
         return <span className={`btn btn-xs ${mapClass}`}>{row.estatus || "-"}</span>;
       }
@@ -217,7 +217,7 @@ function Medicamentos() {
             <li><b>Cantidad disponible:</b> {medicamentoToShow.cantidad_disponible}</li>
             <li><b>Estatus:</b> {medicamentoToShow.estatus}</li>
             <li><b>Categoría:</b> {medicamentoToShow.categoria_nombre || "-"}</li>
-            <li><b>Actualización:</b> {medicamentoToShow.fecha_ultima_actualizacion?.slice(0,19) || "-"}</li>
+            {/* <li><b>Actualización:</b> {medicamentoToShow.fecha_ultima_actualizacion?.slice(0, 19) || "-"}</li> */}
           </ul>
         )}
       </InfoModal>
@@ -269,7 +269,7 @@ function Medicamentos() {
 
       <section className="card-container">
         <Card color="#0033A0" title="Total">
-          <img src={icon.pildora1} alt="" className="icon-card" />
+          <img src={icon.medicamentos} alt="" className="icon-card" />
           <span className="number">{stats.total}</span>
           <h3>Total • Medicamentos</h3>
         </Card>
@@ -279,12 +279,12 @@ function Medicamentos() {
           <h3>Disponibles</h3>
         </Card>
         <Card color="#FF8C00" title="Por Acabar">
-          <img src={icon.advertencia} alt="" className="icon-card" />
+          <img src={icon.agotar} alt="" className="icon-card" />
           <span className="number">{stats.porAcabar}</span>
           <h3>Por Acabar</h3>
         </Card>
         <Card color="#CE1126" title="Agotados">
-          <img src={icon.stop} alt="" className="icon-card" />
+          <img src={icon.agotado} alt="" className="icon-card" />
           <span className="number">{stats.agotados}</span>
           <h3>Agotados</h3>
         </Card>
@@ -320,7 +320,7 @@ function Medicamentos() {
               <img src={icon.excel} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Excel
             </button>
             <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.addUser} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Medicamento
+              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Medicamento
             </button>
           </div>
         </div>

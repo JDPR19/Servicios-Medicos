@@ -1,226 +1,324 @@
 import React, { useState, useEffect } from "react";
-import icon from "../components/icon";
+import axios from "axios";
+import { BaseUrl } from "../utils/Constans";
+import { useToast } from "../components/userToasd";
+import Spinner from "../components/spinner";
+import SingleSelect from "../components/SingleSelect";
+import { jwtDecode } from "jwt-decode";
 import "../index.css";
-import { useNavigate } from "react-router-dom";
 
-// Simulación de catálogos (puedes reemplazar por fetch real)
-const fetchPacientes = async () => [
-  { id: 1, nombre: "Juan Pérez" },
-  { id: 2, nombre: "María Gómez" },
-  { id: 3, nombre: "Pedro Ruiz" },
-];
-const fetchUsuarios = async () => [
-  { id: 1, nombre: "Dr. Salas" },
-  { id: 2, nombre: "Dra. López" },
-];
-const fetchConsultas = async () => [
-  { id: 1, codigo: "CON-001" },
-  { id: 2, codigo: "CON-002" },
-  { id: 3, codigo: "CON-003" },
-];
+function ForReposos({ pacienteId, onSuccess, onCancel, reposoToEdit = null, readOnly = false }) {
+    const showToast = useToast();
+    const [loading, setLoading] = useState(false);
+    const [consultas, setConsultas] = useState([]);
+    const [loadingConsultas, setLoadingConsultas] = useState(true);
+    const [diasCalculados, setDiasCalculados] = useState(0);
 
-function ForReposos({ initialData = {}, onSave }) {
-  const navigate = useNavigate();
-  const initialForm = {
-    codigo: "",
-    fecha_inicio: "",
-    fecha_fin: "",
-    diagnostico: "",
-    observacion: "",
-    estado: "activo",
-    consulta_id: "",
-    pacientes_id: "",
-    usuarios_id: "",
-  };
+    const [formData, setFormData] = useState({
+        fecha_inicio: new Date().toISOString().split('T')[0],
+        fecha_fin: "",
+        hora_fin: "",
+        diagnostico: "",
+        observacion: "",
+        consulta_id: "",
+        estado: "activo"
+    });
 
-  const [form, setForm] = useState({ ...initialForm, ...initialData });
-  const [pacientes, setPacientes] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [consultas, setConsultas] = useState([]);
+    // Cargar consultas del paciente
+    useEffect(() => {
+        const fetchConsultas = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                const response = await axios.get(`${BaseUrl}consultas/paciente/${pacienteId}`, { headers });
+                const consultasData = response.data || [];
+                setConsultas(consultasData);
 
-  useEffect(() => {
-    setForm((f) => ({ ...f, ...initialData }));
-  }, []);
+                // Si solo hay una consulta y estamos creando, pre-seleccionarla
+                if (consultasData.length === 1 && !reposoToEdit) {
+                    setFormData(prev => ({
+                        ...prev,
+                        consulta_id: consultasData[0].id
+                    }));
+                }
+            } catch (error) {
+                console.error("Error al cargar consultas:", error);
+                showToast?.("Error al cargar las consultas del paciente", "error");
+            } finally {
+                setLoadingConsultas(false);
+            }
+        };
 
-  useEffect(() => {
-    fetchPacientes().then(setPacientes);
-    fetchUsuarios().then(setUsuarios);
-    fetchConsultas().then(setConsultas);
-  }, []);
+        if (pacienteId) {
+            fetchConsultas();
+        }
+    }, [pacienteId, reposoToEdit]);
 
-  // Calcula días de reposo automáticamente
-  const calcularDiasReposo = (inicio, fin) => {
-    if (!inicio || !fin) return "";
-    const d1 = new Date(inicio);
-    const d2 = new Date(fin);
-    const diff = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
-    return diff > 0 ? diff : "";
-  };
+    // Cargar datos si se está editando
+    useEffect(() => {
+        if (reposoToEdit) {
+            setFormData({
+                fecha_inicio: reposoToEdit.fecha_inicio ? reposoToEdit.fecha_inicio.split('T')[0] : "",
+                fecha_fin: reposoToEdit.fecha_fin ? reposoToEdit.fecha_fin.split('T')[0] : "",
+                hora_fin: reposoToEdit.hora_fin || "",
+                diagnostico: reposoToEdit.diagnostico || "",
+                observacion: reposoToEdit.observacion || "",
+                consulta_id: reposoToEdit.consulta_id || "",
+                estado: reposoToEdit.estado || "activo"
+            });
+        }
+    }, [reposoToEdit]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    // Calcular días de reposo cuando cambian las fechas
+    useEffect(() => {
+        if (formData.fecha_inicio && formData.fecha_fin) {
+            const inicio = new Date(formData.fecha_inicio);
+            const fin = new Date(formData.fecha_fin);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSave) onSave(form);
-  };
+            if (fin >= inicio) {
+                const diffTime = Math.abs(fin - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir el día de inicio
+                setDiasCalculados(diffDays);
+            } else {
+                setDiasCalculados(0);
+            }
+        } else {
+            setDiasCalculados(0);
+        }
+    }, [formData.fecha_inicio, formData.fecha_fin]);
 
-  const handleCancel = () => {
-    navigate('/admin/Reposos');
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-  const handleClear = () => {
-    setForm(initialForm);
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (readOnly) return;
 
-  return (
-    <form className="forc-page" onSubmit={handleSubmit}>
-      <div className="forc-section-title">
-        <img src={icon.folder || icon.user} alt="" className="icon" />
-        <span>Registro de Reposo Médico</span>
-      </div>
-      <div className="forc-grid">
-        <div className="fc-field">
-          <label>Código</label>
-          <input
-            name="codigo"
-            value={form.codigo}
-            onChange={handleChange}
-            placeholder="Se genera automáticamente"
-            disabled
-          />
-        </div>
-        <div className="fc-field">
-          <label>Consulta asociada</label>
-          <select
-            name="consulta_id"
-            value={form.consulta_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {consultas.map((c) => (
-              <option key={c.id} value={c.id}>{c.codigo}</option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Paciente</label>
-          <select
-            name="pacientes_id"
-            value={form.pacientes_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {pacientes.map((p) => (
-              <option key={p.id} value={p.id}>{p.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Médico</label>
-          <select
-            name="usuarios_id"
-            value={form.usuarios_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione…</option>
-            {usuarios.map((u) => (
-              <option key={u.id} value={u.id}>{u.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="fc-field">
-          <label>Fecha de inicio</label>
-          <input
-            type="date"
-            name="fecha_inicio"
-            value={form.fecha_inicio}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Fecha de fin</label>
-          <input
-            type="date"
-            name="fecha_fin"
-            value={form.fecha_fin}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Días de reposo</label>
-          <input
-            name="dias_reposo"
-            value={calcularDiasReposo(form.fecha_inicio, form.fecha_fin)}
-            readOnly
-            disabled
-          />
-        </div>
-        <div className="fc-field">
-          <label>Diagnóstico</label>
-          <textarea
-            name="diagnostico"
-            rows={2}
-            value={form.diagnostico}
-            onChange={handleChange}
-            placeholder="Diagnóstico médico"
-            required
-          />
-        </div>
-        <div className="fc-field">
-          <label>Observación</label>
-          <textarea
-            name="observacion"
-            rows={2}
-            value={form.observacion}
-            onChange={handleChange}
-            placeholder="Observaciones adicionales"
-          />
-        </div>
-        <div className="fc-field">
-          <label>Estado</label>
-          <select
-            name="estado"
-            value={form.estado}
-            onChange={handleChange}
-            required
-          >
-            <option value="activo">Activo</option>
-            <option value="finalizado">Finalizado</option>
-            <option value="anulado">Anulado</option>
-          </select>
-        </div>
-      </div>
+        setLoading(true);
 
-      <div className="forc-actions">
-        <button className="btn btn-outline" type="button" onClick={handleCancel}>
-          Cancelar y Regresar
-        </button>
-        <div className="forc-actions-right">
-          <button
-            className="btn btn-secondary"
-            type="button"
-            onClick={handleClear}
-          >
-            Limpiar
-          </button>
-          <button className="btn btn-primary" type="submit">
-            Guardar
-          </button>
-        </div>
-      </div>
-    </form>
-  );
+        try {
+            const token = localStorage.getItem("token");
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+            // Validaciones
+            if (!formData.consulta_id) {
+                showToast?.("Debe seleccionar una consulta asociada", "error");
+                setLoading(false);
+                return;
+            }
+
+            if (new Date(formData.fecha_fin) < new Date(formData.fecha_inicio)) {
+                showToast?.("La fecha fin no puede ser menor a la fecha de inicio", "error");
+                setLoading(false);
+                return;
+            }
+
+            // Obtener ID de usuario del token
+            let usuarios_id = null;
+            if (token) {
+                const decoded = jwtDecode(token);
+                usuarios_id = decoded.id;
+            }
+
+            const dataToSend = {
+                ...formData,
+                pacientes_id: parseInt(pacienteId),
+                usuarios_id: usuarios_id,
+                consulta_id: parseInt(formData.consulta_id)
+            };
+
+            if (reposoToEdit) {
+                await axios.put(`${BaseUrl}reposos/actualizar/${reposoToEdit.id}`, dataToSend, { headers });
+                showToast?.("Reposo actualizado correctamente", "success");
+            } else {
+                await axios.post(`${BaseUrl}reposos/registrar`, dataToSend, { headers });
+                showToast?.("Reposo registrado correctamente", "success");
+            }
+
+            onSuccess?.();
+        } catch (error) {
+            console.error("Error al guardar reposo:", error);
+            showToast?.(error.response?.data?.message || "Error al guardar el reposo", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loadingConsultas) {
+        return (
+            <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
+                <Spinner size={40} label="Cargando consultas..." />
+            </div>
+        );
+    }
+
+    const consultasOptions = consultas.map(consulta => {
+        const fecha = new Date(consulta.fecha_atencion).toLocaleDateString('es-ES', {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
+        return {
+            value: consulta.id,
+            label: `${consulta.codigo} - ${fecha}`
+        };
+    });
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="forc-section-title"></div>
+
+            <div className="forc-grid cols-2">
+                {/* Consulta */}
+                <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+                    <label><span className="unique">*</span>Consulta Asociada</label>
+                    <SingleSelect
+                        options={consultasOptions}
+                        value={consultasOptions.find(opt => opt.value === formData.consulta_id) || null}
+                        onChange={(opt) => setFormData(prev => ({ ...prev, consulta_id: opt ? opt.value : "" }))}
+                        placeholder="Seleccione la consulta médica..."
+                        isDisabled={!!reposoToEdit || readOnly}
+                    />
+                    {consultas.length === 0 && (
+                        <small style={{ color: "red", marginTop: 5 }}>
+                            Es necesario registrar una consulta médica antes de crear un reposo.
+                        </small>
+                    )}
+                </div>
+
+                {/* Fechas */}
+                <div className="fc-field">
+                    <label><span className="unique">*</span>Fecha Inicio</label>
+                    <input
+                        type="date"
+                        name="fecha_inicio"
+                        value={formData.fecha_inicio}
+                        onChange={handleChange}
+                        required
+                        disabled={readOnly}
+                    />
+                </div>
+
+                <div className="fc-field">
+                    <label><span className="unique">*</span>Fecha Fin</label>
+                    <input
+                        type="date"
+                        name="fecha_fin"
+                        value={formData.fecha_fin}
+                        onChange={handleChange}
+                        required
+                        disabled={readOnly}
+                        min={formData.fecha_inicio}
+                    />
+                </div>
+
+                <div className="fc-field">
+                    <label>Hora Fin (Opcional)</label>
+                    <input
+                        type="time"
+                        name="hora_fin"
+                        value={formData.hora_fin}
+                        onChange={handleChange}
+                        disabled={readOnly}
+                    />
+                </div>
+
+                {/* Indicador de días - Ahora ocupa el espacio a la derecha de la hora */}
+                <div className="fc-field" style={{ display: "flex", alignItems: "flex-end" }}>
+                    {diasCalculados > 0 ? (
+                        <div style={{
+                            width: "100%",
+                            backgroundColor: "#e0f2fe",
+                            padding: "10px",
+                            borderRadius: "8px",
+                            color: "#0369a1",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            height: "42px", // Altura similar al input para alinear
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                        }}>
+                            Duración: {diasCalculados} día{diasCalculados !== 1 ? 's' : ''}
+                        </div>
+                    ) : (
+                        <div style={{ padding: "10px", color: "#9ca3af", fontStyle: "italic", textAlign: "center", width: "100%" }}>
+                            Seleccione fechas para calcular días
+                        </div>
+                    )}
+                </div>
+
+                {/* Diagnóstico */}
+                <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+                    <label>Diagnóstico</label>
+                    <textarea
+                        name="diagnostico"
+                        value={formData.diagnostico}
+                        onChange={handleChange}
+                        rows="2"
+                        placeholder="Diagnóstico que justifica el reposo..."
+                        disabled={readOnly}
+                    />
+                </div>
+
+                {/* Observación */}
+                <div className="fc-field" style={{ gridColumn: "1 / -1" }}>
+                    <label>Observaciones</label>
+                    <textarea
+                        name="observacion"
+                        value={formData.observacion}
+                        onChange={handleChange}
+                        rows="3"
+                        placeholder="Indicaciones adicionales..."
+                        disabled={readOnly}
+                    />
+                </div>
+
+                {/* Estado (Solo visible si se edita) */}
+                {reposoToEdit && !readOnly && (
+                    <div className="fc-field">
+                        <label>Estado</label>
+                        <select
+                            name="estado"
+                            value={formData.estado}
+                            onChange={handleChange}
+                            className="form-select"
+                        >
+                            <option value="activo">Activo</option>
+                            <option value="finalizado">Finalizado</option>
+                            <option value="anulado">Anulado</option>
+                        </select>
+                    </div>
+                )}
+            </div>
+
+            {/* Botones */}
+            <div className="forc-actions" style={{ marginTop: 30, marginBottom: 20 }}>
+                <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={onCancel}
+                    disabled={loading}
+                >
+                    {readOnly ? "Cerrar" : "Cancelar"}
+                </button>
+                {!readOnly && (
+                    <div className="forc-actions-right">
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            disabled={loading || consultas.length === 0}
+                        >
+                            {loading ? <Spinner size={20} /> : reposoToEdit ? "Actualizar" : "Registrar Reposo"}
+                        </button>
+                    </div>
+                )}
+            </div>
+        </form>
+    );
 }
 
 export default ForReposos;

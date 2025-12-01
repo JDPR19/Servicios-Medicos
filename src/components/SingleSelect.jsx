@@ -17,16 +17,16 @@ const customSelectStyles = {
         fontSize: 15,
         color: '#242424',
         '&:hover': {
-        borderColor: '#0033A0',
+            borderColor: '#0033A0',
         },
     }),
     option: (provided, state) => ({
         ...provided,
         backgroundColor: state.isSelected
-        ? '#e7f1ff'
-        : state.isFocused
-        ? '#99d6ea'
-        : '#fff',
+            ? '#e7f1ff'
+            : state.isFocused
+                ? '#99d6ea'
+                : '#fff',
         color: '#242424',
         fontFamily: "'Roboto', sans-serif",
         fontSize: 15,
@@ -50,12 +50,12 @@ const customSelectStyles = {
     }),
     menuList: (provided) => ({
         ...provided,
-        maxHeight: 160, 
+        maxHeight: 160,
         overflowY: 'auto'
     }),
     menuPortal: base => ({
         ...base,
-        zIndex: 19999, 
+        zIndex: 19999,
     }),
     input: (provided) => ({
         ...provided,
@@ -65,22 +65,22 @@ const customSelectStyles = {
     }),
     singleValue: (provided) => ({
         ...provided,
-        maxWidth: 180, 
+        maxWidth: 180,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
         display: 'block',
     }),
-    };
+};
 
-    const SingleSelect = ({
+const SingleSelect = ({
     options,
     value,
     onChange,
     placeholder = "Selecciona...",
     isClearable = true,
     ...props
-    }) => (
+}) => (
     <Select
         isMulti={false}
         options={options}
@@ -91,8 +91,9 @@ const customSelectStyles = {
         styles={customSelectStyles}
         isClearable={isClearable}
         menuPortalTarget={document.body}
+        menuPosition="fixed"
         {...props}
     />
-    );
+);
 
 export default SingleSelect;

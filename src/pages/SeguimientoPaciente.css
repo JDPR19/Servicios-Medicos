@@ -1,0 +1,77 @@
+/* SeguimientoPaciente.css */
+
+/* Estilos de las tarjetas */
+.card-style {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: default;
+}
+
+.card-header-style {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fafafa;
+}
+
+.card-footer-style {
+  padding: 15px;
+  border-top: 1px solid #f0f0f0;
+  background-color: white;
+}
+
+/* Header del paciente */
+.patient-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.patient-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: #0033a0;
+  font-weight: bold;
+}
+
+/* Grid de módulos */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Sección de historial */
+.history-section {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.history-placeholder {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  border: 2px dashed #eee;
+  border-radius: 8px;
+}
