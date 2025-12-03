@@ -14,14 +14,17 @@ import FormModalOne from "../components/FormModalOne";
 import ForConsultas from "../Formularios/ForConsultas";
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
 import SingleSelect from "../components/SingleSelect";
+import { generateConsultaPDF } from '../utils/pdfGenerator';
+import { usePermiso } from '../utils/usePermiso';
 
 function Consultas() {
+  const TienePermiso = usePermiso();
   const [pdfUrl, setPdfUrl] = useState(null);
   const showToast = useToast();
   const [consultaToShow, setConsultaToShow] = useState(null);
   const [consultas, setConsultas] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ estatus: "todos", q: "" });
+  const [filters, setFilters] = useState({ estatus: "todos", q: "", periodo: "todos" });
   const [selectedConsulta, setSelectedConsulta] = useState(null);
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,11 +52,9 @@ function Consultas() {
 
   const handleEdit = async (row) => {
     try {
-      // Pedimos la consulta completa que SI tiene los medicamentos
       const response = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
       const consultaCompleta = response.data;
 
-      // Preparamos los medicamentos para el formulario
       const medicamentosFormato = (consultaCompleta.medicamentos || []).map(med => ({
         medicamento_id: med.medicamento_id,
         cantidad_utilizada: med.cantidad_utilizada
@@ -69,6 +70,26 @@ function Consultas() {
     }
   };
 
+  const handlePrintConsulta = async (row) => {
+    if (!row.id) return;
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
+      const consultaCompleta = res.data;
+
+      const docBlob = generateConsultaPDF(consultaCompleta);
+      if (docBlob) {
+        const url = URL.createObjectURL(docBlob);
+        setPdfUrl(url);
+      }
+    } catch (error) {
+      console.error('Error generando PDF:', error);
+      showToast?.('Error al generar el PDF', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleSaved = () => {
     fetchConsultas();
@@ -81,7 +102,7 @@ function Consultas() {
       const response = await axios.get(`${BaseUrl}consultas/ver/${row.id}`, { headers: getAuthHeaders() });
       setConsultaToShow(response.data);
     } catch (error) {
-      showToast?.('Error obten iendo los detalles de la consulta', 'error', 3000);
+      showToast?.('Error obteniendo los detalles de la consulta', 'error', 3000);
     }
   };
 
@@ -125,6 +146,12 @@ function Consultas() {
     { value: "Pendiente", label: "Pendiente" }
   ];
 
+  const periodoOptions = [
+    { value: "todos", label: "Todo el tiempo" },
+    { value: "hoy", label: "Hoy" },
+    { value: "semana", label: "Esta Semana" }
+  ];
+
   const fetchConsultas = async () => {
     setLoading(true);
     try {
@@ -158,10 +185,29 @@ function Consultas() {
   const filtered = useMemo(() => {
     const q = filters.q.trim().toLowerCase();
     const est = filters.estatus;
+    const per = filters.periodo;
     return consultas.filter(c => {
       const matchQ = !q || `${c.codigo || ""} ${c.diagnostico || ""} ${c.observaciones || ""}`.toLowerCase().includes(q);
       const matchEstatus = est === 'todos' ? true : c.estatus === est;
-      return matchQ && matchEstatus;
+      let matchPeriodo = true;
+      if (per && per !== 'todos') {
+        const date = new Date(c.fecha_atencion);
+        const today = new Date();
+        date.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        if (per === 'hoy') {
+          matchPeriodo = date.getTime() === today.getTime();
+        } else if (per === 'semana') {
+          const startOfWeek = new Date(today);
+          const dayOfWeek = today.getDay() || 7;
+          startOfWeek.setDate(today.getDate() - dayOfWeek + 1);
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          matchPeriodo = date >= startOfWeek && date <= endOfWeek;
+        }
+      }
+      return matchQ && matchEstatus && matchPeriodo;
     });
   }, [consultas, filters]);
 
@@ -173,14 +219,36 @@ function Consultas() {
     },
     { accessor: "codigo", header: "Código", key: "codigo" },
     { accessor: "diagnostico", header: "Diagnóstico", key: "diagnostico" },
-    { accessor: "estatus", header: "Estatus", key: "estatus" },
+    {
+      accessor: "estatus",
+      header: "Estatus",
+      key: "estatus",
+      render: (row) => {
+        let badgeClass = "badge";
+        const status = (row.estatus || "").toLowerCase();
+        if (status === "realizada") badgeClass += " badge--success";
+        else if (status === "pendiente") badgeClass += " badge--warn";
+        else if (status === "cancelada") badgeClass += " badge--drop";
+
+        return <span className={badgeClass}>{row.estatus}</span>;
+      }
+    },
     {
       header: "Acciones",
       render: (row) => (
         <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          {TienePermiso('consulta', 'ver') && (
+            <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+          )}
+          {TienePermiso('consulta', 'editar') && (
+            <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+          )}
+          {TienePermiso('consulta', 'exportar') && (
+            <button className="btn btn-xs btn-outline btn-print" onClick={() => handlePrintConsulta(row)} title="Imprimir Ficha">Imprimir</button>
+          )}
+          {TienePermiso('consulta', 'eliminar') && (
+            <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          )}
         </div>
       )
     },
@@ -190,6 +258,19 @@ function Consultas() {
     { header: "N°", key: "orden", render: (_row, idx) => idx + 1 },
     { header: "Código", key: "codigo" },
     { header: "Diagnóstico", key: "diagnostico" },
+    { header: "Observaciones", key: "observaciones" },
+    { header: "Tratamientos", key: "tratamientos" },
+    {
+      header: "Medicamentos",
+      key: "medicamentos",
+      render: (row) => {
+        if (!row.medicamentos || row.medicamentos.length === 0) return "N/A";
+        return row.medicamentos.map(med =>
+          `${med.medicamento_nombre} (${med.cantidad_utilizada})`
+        ).join(", ");
+      }
+    },
+    { header: "Fecha Atención", key: "fecha_atencion" },
     { header: "Estatus", key: "estatus" }
   ];
 
@@ -307,7 +388,7 @@ function Consultas() {
       <section className="quick-actions2">
         <div className="pac-toolbar">
           <div className="filters">
-            <div className="field">
+            {/* <div className="field">
               <img src={icon.lupa2} alt="" className="field-icon" />
               <input
                 type="text"
@@ -315,7 +396,7 @@ function Consultas() {
                 value={filters.q}
                 onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
               />
-            </div>
+            </div> */}
             <div>
               <SingleSelect
                 options={estatusOptions}
@@ -327,18 +408,35 @@ function Consultas() {
                 placeholder="Estatus"
               />
             </div>
+            <div style={{ marginLeft: 10, width: 200 }}>
+              <SingleSelect
+                options={periodoOptions}
+                value={periodoOptions.find(opt => opt.value === filters.periodo)}
+                onChange={opt =>
+                  setFilters(f => ({ ...f, periodo: opt ? opt.value : "todos" }))
+                }
+                isClearable={false}
+                placeholder="Periodo"
+              />
+            </div>
           </div>
 
           <div className="actions">
-            <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
-            </button>
-            <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
-            </button>
-            <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nueva Consulta
-            </button>
+            {TienePermiso('consulta', 'exportar') && (
+              <button className="btn btn-secondary " onClick={handlePreviewPDF}>
+                <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
+              </button>
+            )}
+            {TienePermiso('consulta', 'exportar') && (
+              <button className="btn btn-secondary" onClick={handleExportExcel}>
+                <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
+              </button>
+            )}
+            {TienePermiso('consulta', 'crear') && (
+              <button className="btn btn-primary" onClick={handleNuevo}>
+                <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nueva Consulta
+              </button>
+            )}
           </div>
         </div>
       </section>

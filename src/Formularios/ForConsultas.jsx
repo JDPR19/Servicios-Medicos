@@ -25,6 +25,7 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
     pacientes_id: null,
     enfermedades_id: null,
     medicamentos_ids: [],
+    citas_id: null,
     ...initialData,
   };
 
@@ -33,6 +34,7 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
   const [pacientes, setPacientes] = useState([]);
   const [enfermedades, setEnfermedades] = useState([]);
   const [medicamentos, setMedicamentos] = useState([]);
+  const [citasPendientes, setCitasPendientes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPacienteModal, setShowPacienteModal] = useState(false);
 
@@ -59,6 +61,47 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
     };
     fetchCatalogos();
   }, []);
+
+  // Cargar citas pendientes cuando cambia el paciente
+  useEffect(() => {
+    const fetchCitasPendientes = async () => {
+      if (!form.pacientes_id) {
+        setCitasPendientes([]);
+        return;
+      }
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${BaseUrl}citas/pendientes/${form.pacientes_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        let citas = response.data;
+
+        // Si estamos editando y hay una cita asociada, verificar si está en la lista
+        if (isEdit && form.citas_id) {
+          const citaExiste = citas.find(c => c.id === form.citas_id);
+
+          // Si la cita asociada no está en pendientes, cargarla por separado
+          if (!citaExiste) {
+            try {
+              const citaResponse = await axios.get(`${BaseUrl}citas/ver/${form.citas_id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              const citaActual = citaResponse.data;
+              // Agregar la cita actual al inicio de la lista
+              citas = [citaActual, ...citas];
+            } catch (error) {
+              console.error("Error cargando cita asociada:", error);
+            }
+          }
+        }
+
+        setCitasPendientes(citas);
+      } catch (error) {
+        console.error("Error cargando citas pendientes:", error);
+      }
+    };
+    fetchCitasPendientes();
+  }, [form.pacientes_id, isEdit]);
 
   useEffect(() => {
     setForm({ ...initialForm, ...initialData });
@@ -221,6 +264,29 @@ function ForConsultas({ initialData = {}, onSave, onClose }) {
             />
             {errors.pacientes_id && <span style={{ color: "red" }}>{errors.pacientes_id}</span>}
           </div>
+
+          {/* Selector de Cita Asociada (Dinámico) */}
+          <div className="fc-field">
+            <label>Cita Asociada (Opcional)</label>
+            <SingleSelect
+              options={citasPendientes.map(c => ({
+                value: c.id,
+                label: `${c.fecha_cita.split('T')[0]} ${c.hora_cita} - ${c.doctor_nombre || ''} ${c.doctor_apellido || ''}`
+              }))}
+              value={citasPendientes.find(c => c.id === form.citas_id) ? {
+                value: form.citas_id,
+                label: (() => {
+                  const c = citasPendientes.find(c => c.id === form.citas_id);
+                  return c ? `${c.fecha_cita.split('T')[0]} ${c.hora_cita} - ${c.doctor_nombre || ''} ${c.doctor_apellido || ''}` : "";
+                })()
+              } : null}
+              onChange={opt => setForm(f => ({ ...f, citas_id: opt ? opt.value : null }))}
+              placeholder={citasPendientes.length > 0 ? "Seleccione una cita pendiente..." : "No hay citas pendientes"}
+              isDisabled={!form.pacientes_id || citasPendientes.length === 0}
+              isClearable={true}
+            />
+          </div>
+
           <div className="fc-field">
             <label><span className="unique">*</span>Enfermedad</label>
             <SingleSelect

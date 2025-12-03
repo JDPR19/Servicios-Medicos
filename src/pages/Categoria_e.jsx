@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from  'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Spinner from '../components/spinner';
 import icon from '../components/icon';
@@ -9,10 +9,12 @@ import FormModal from '../components/FormModal';
 import ForCategoria_e from '../Formularios/ForCategoria_e.jsx';
 import Tablas from '../components/Tablas';
 import { useToast } from '../components/userToasd';
-import {BaseUrl} from '../utils/Constans';
+import { BaseUrl } from '../utils/Constans';
 import { useMemo } from 'react';
+import { usePermiso } from '../utils/usePermiso';
 
-function Categoria_e () {
+function Categoria_e() {
+    const TienePermiso = usePermiso();
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
@@ -20,15 +22,15 @@ function Categoria_e () {
     const [selectedCategoria, setSelectedCategoria] = useState(null);
     const [editCategoria, setEditCategoria] = useState(null);
     const [categoriaShow, setCategoriaShow] = useState(null);
-    const [filters, setFilters] = useState({estado: "todos", q: ""});
+    const [filters, setFilters] = useState({ estado: "todos", q: "" });
     const ShowToast = useToast();
-    
-    
-////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
+
+
+    ////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
 
     const getAuhtorization = () => {
         const token = (localStorage.getItem('token') || '').trim();
-        return token ? {Authorization: `Bearer ${token}`} : {};
+        return token ? { Authorization: `Bearer ${token}` } : {};
     }
 
     const openConfirmModal = (id) => {
@@ -59,7 +61,7 @@ function Categoria_e () {
 
     const stats = useMemo(() => {
         const total = categoria.length;
-        return { total }; 
+        return { total };
     }, [categoria]);
 
     const filtered = useMemo(() => {
@@ -74,7 +76,7 @@ function Categoria_e () {
         {
             header: "N°",
             key: "order",
-            render: (_row, idx) => idx + 1 
+            render: (_row, idx) => idx + 1
         },
         {
             accessor: "nombre", header: "Nombre", key: "nombre"
@@ -82,71 +84,77 @@ function Categoria_e () {
         {
             header: "Acciones",
             render: (row) => (
-                <div className='row-actions' style={{display: 'flex', gap:8}}>
-                    <button className='btn btn-xs btn-outline btn-view' title='Ver Detalles' onClick={() => handleView(row)}>Ver</button>
-                    <button className='btn btn-xs btn-outline btn-edit' title='Editar' onClick={() => handleEdit(row)}>Editar</button>
-                    <button className='btn btn-xs btn-outline btn-danger' title='Eliminar' onClick={() => openConfirmModal(row.id)}>Eliminar</button>
+                <div className='row-actions' style={{ display: 'flex', gap: 8 }}>
+                    {TienePermiso('categoria_e', 'ver') && (
+                        <button className='btn btn-xs btn-outline btn-view' title='Ver Detalles' onClick={() => handleView(row)}>Ver</button>
+                    )}
+                    {TienePermiso('categoria_e', 'editar') && (
+                        <button className='btn btn-xs btn-outline btn-edit' title='Editar' onClick={() => handleEdit(row)}>Editar</button>
+                    )}
+                    {TienePermiso('categoria_e', 'eliminar') && (
+                        <button className='btn btn-xs btn-outline btn-danger' title='Eliminar' onClick={() => openConfirmModal(row.id)}>Eliminar</button>
+                    )}
                 </div>
             )
         },
     ];
 
-/////////////////////////////////////Peticiones/////////////////////////////////////////////////////////////// 
+    /////////////////////////////////////Peticiones/////////////////////////////////////////////////////////////// 
 
-const fecthCategoria = async () => {
-    setLoading(true);
-    try{
-        const response = await axios.get(`${BaseUrl}categoria_e`, { headers: getAuhtorization() });
-        const data = response.data;
-        if(!Array.isArray(data)) {
-            console.warn('Respuesta inesperada /categoria_e', data);
+    const fecthCategoria = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${BaseUrl}categoria_e`, { headers: getAuhtorization() });
+            const data = response.data;
+            if (!Array.isArray(data)) {
+                console.warn('Respuesta inesperada /categoria_e', data);
+                setCategoria([]);
+                ShowToast?.('Respuesta inesperada del Servidor', 'error', 4000);
+            }
+            setCategoria(data);
+        } catch (error) {
+            console.error('Error obteniendo todos las Categorias', error?.response?.data || error.message);
+            ShowToast?.('Error Obteniendo todos las Categorias', 'error', 3000);
             setCategoria([]);
-            ShowToast?.('Respuesta inesperada del Servidor', 'error', 4000);
+        } finally {
+            setLoading(false);
         }
-        setCategoria(data);
-    }catch (error){
-        console.error('Error obteniendo todos las Categorias', error?.response?.data || error.message);
-        ShowToast?.('Error Obteniendo todos las Categorias', 'error', 3000);
-        setCategoria([]);
-    }finally {
-        setLoading(false);
     }
-}
 
-useEffect(() => {
-    fecthCategoria();
-}, []);
+    useEffect(() => {
+        fecthCategoria();
+    }, []);
 
-//////////////////////////////////////Manejadores///////////////////////////////////////////////////////////
+    //////////////////////////////////////Manejadores///////////////////////////////////////////////////////////
 
-const handleView = async (row) => {
-    setLoading(true);
-    try {
-        const response = await axios.get(`${BaseUrl}categoria_e/ver/${row.id}`, { headers: getAuhtorization() });
-        setCategoriaShow(response.data);
-    } catch (error) {
-        console.error('error al mostrar datos' ,error?.response?.data || error.message);
-        ShowToast?.('Error al mostrar datos de esta categoria', 'error', 3000);
-    }finally{
-        setLoading(false);
+    const handleView = async (row) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${BaseUrl}categoria_e/ver/${row.id}`, { headers: getAuhtorization() });
+            setCategoriaShow(response.data);
+        } catch (error) {
+            console.error('error al mostrar datos', error?.response?.data || error.message);
+            ShowToast?.('Error al mostrar datos de esta categoria', 'error', 3000);
+        } finally {
+            setLoading(false);
+        }
     }
-} 
 
-const handleDelete = async (id) => {
-    setLoading(true);
-    try {
-        await axios.delete(`${BaseUrl}categoria_e/eliminar/${id}`, { headers: getAuhtorization() });
-        ShowToast('Categoria eliminada con exito', 'success', 3000);
-        await fecthCategoria();
-    } catch (error) {
-        console.error('Error Eliminando la categoria', error?.response?.data || error.message);
-        ShowToast?.('Error eliminando la categoria', 'error', 3000);
-    }finally{
-        setLoading(false);
+    const handleDelete = async (id) => {
+        setLoading(true);
+        try {
+            await axios.delete(`${BaseUrl}categoria_e/eliminar/${id}`, { headers: getAuhtorization() });
+            ShowToast('Categoria eliminada con exito', 'success', 3000);
+            await fecthCategoria();
+        } catch (error) {
+            console.error('Error Eliminando la categoria', error?.response?.data || error.message);
+            ShowToast?.('Error eliminando la categoria', 'error', 3000);
+        } finally {
+            setLoading(false);
+        }
     }
-}
 
-///////////////////////////////////// fin Peticiones/////////////////////////////////////////////////////////////// 
+    ///////////////////////////////////// fin Peticiones/////////////////////////////////////////////////////////////// 
 
     return (
         <div className='pac-page'>
@@ -162,12 +170,12 @@ const handleDelete = async (id) => {
                 title='Información de Categoria'
             >
                 {categoriaShow && (
-                    <ul style={{listStyle: "none", padding: 0}}>
+                    <ul style={{ listStyle: "none", padding: 0 }}>
                         <li><b>Nombre de Categoria: </b>{categoriaShow.nombre}</li>
                     </ul>
                 )}
             </InfoModal>
-            
+
             <ConfirmModal
                 isOpen={confirmModal}
                 onClose={closeConfirmModal}
@@ -195,7 +203,7 @@ const handleDelete = async (id) => {
 
             <section className='card-container'>
                 <Card color="#0033A0" title="Total de Categorias">
-                    <img src={icon.folder} alt='icono categoria'  className='icon-card'/>
+                    <img src={icon.folder} alt='icono categoria' className='icon-card' />
                     <span className='number'>{stats.total}</span>
                     <h3>Total • Cargos</h3>
                 </Card>
@@ -207,21 +215,23 @@ const handleDelete = async (id) => {
 
                         <div className='field'>
                             <img src={icon.lupa2} alt="Buscar..." className='field-icon' />
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder='Buscar por Nombre'
                                 value={filters.q}
-                                onChange={(e) => setFilters(f => ({...f, q: e.target.value }))}
-                                />
+                                onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
+                            />
                         </div>
 
                     </div>
 
                     <div className='actions'>
-                        <button className='btn btn-primary' onClick={handleNuevo}>
-                            <img src={icon.user5} alt="Nuevo Registro" className='btn-icon' style={{marginRight:5}}/>
-                            Nueva Categoria de Patologias 
-                        </button>
+                        {TienePermiso('categoria_e', 'crear') && (
+                            <button className='btn btn-primary' onClick={handleNuevo}>
+                                <img src={icon.user5} alt="Nuevo Registro" className='btn-icon' style={{ marginRight: 5 }} />
+                                Nueva Categoria de Patologias
+                            </button>
+                        )}
                     </div>
                 </div>
             </section>

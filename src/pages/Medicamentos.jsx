@@ -13,9 +13,11 @@ import FormModal from "../components/FormModal";
 import ForMedicamentos from "../Formularios/ForMedicamentos";
 import SingleSelect from "../components/SingleSelect";
 import { exportToPDF, exportToExcel } from "../utils/exportUtils";
+import { usePermiso } from '../utils/usePermiso';
 
 function Medicamentos() {
   const showToast = useToast();
+  const tienePermiso = usePermiso();
   const [medicamentos, setMedicamentos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ q: "", estatus: "todos" });
@@ -155,9 +157,9 @@ function Medicamentos() {
       header: "Acciones",
       render: (row) => (
         <div className="row-actions" style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          {tienePermiso("medicamentos", "ver") && <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>}
+          {tienePermiso("medicamentos", "editar") && <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>}
+          {tienePermiso("medicamentos", "eliminar") && <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>}
         </div>
       )
     }
@@ -313,15 +315,21 @@ function Medicamentos() {
             </div>
           </div>
           <div className="actions">
-            <button className="btn btn-secondary" onClick={handlePreviewPDF}>
-              <img src={icon.pdf1} className="btn-icon" alt="" style={{ marginRight: 5 }} /> PDF
-            </button>
-            <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.excel} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Excel
-            </button>
-            <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Medicamento
-            </button>
+            {tienePermiso("medicamentos", "exportar") && (
+              <button className="btn btn-secondary" onClick={handlePreviewPDF}>
+                <img src={icon.pdf1} className="btn-icon" alt="" style={{ marginRight: 5 }} /> PDF
+              </button>
+            )}
+            {tienePermiso("medicamentos", "exportar") && (
+              <button className="btn btn-secondary" onClick={handleExportExcel}>
+                <img src={icon.excel} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Excel
+              </button>
+            )}
+            {tienePermiso("medicamentos", "crear") && (
+              <button className="btn btn-primary" onClick={handleNuevo}>
+                <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Medicamento
+              </button>
+            )}
           </div>
         </div>
       </section>

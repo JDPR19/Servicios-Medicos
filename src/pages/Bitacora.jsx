@@ -6,8 +6,10 @@ import Spinner from "../components/spinner";
 import Table from "../components/Tablas";
 import InfoModal from "../components/InfoModal";
 import { useToast } from "../components/userToasd";
+import { usePermiso } from "../utils/usePermiso";
 
 function Bitacora() {
+    const TienePermiso = usePermiso();
     const [loading, setLoading] = useState(false);
     const [showBitacora, setShowBitacora] = useState(null);
     const [bitacora, setBitacora] = useState([]);
@@ -53,9 +55,13 @@ function Bitacora() {
         {
             header: "Acciones",
             render: (row) => (
+
                 <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn btn-xs btn-outline btn-view" title="Ver Detalles" onClick={() => handleVerDetalle(row.id)}>Ver</button>
+                    {TienePermiso('bitacora', 'ver') && (
+                        <button className="btn btn-xs btn-outline btn-view" title="Ver Detalles" onClick={() => handleVerDetalle(row.id)}>Ver</button>
+                    )}
                 </div>
+
             )
         },
     ];
@@ -155,7 +161,6 @@ function Bitacora() {
                                                     {Array.from(allKeys).map(key => {
                                                         const valOld = data.antiguos?.[key];
                                                         const valNew = data.nuevos?.[key];
-                                                        // Si ambos son iguales, quizás no mostrarlos o mostrarlos normal
                                                         const isDiff = JSON.stringify(valOld) !== JSON.stringify(valNew);
 
                                                         return (

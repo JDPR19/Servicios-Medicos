@@ -73,8 +73,10 @@
 /* Tabs del menú de notificaciones */
 .tabsNoti {
     display: flex;
-    gap: 5px;
-    margin-bottom: 10px;
+    gap: 20px;
+    margin-left: 8px;
+    margin-top: 5px;
+    margin-bottom: 20px;
     justify-content: flex-start;
     border-bottom: 1px solid var(--grey2);
 
@@ -82,9 +84,9 @@
 
 .tabButtonNoti {
     flex-shrink: 0;
-    background: #bddaaf31;
-    color: #4444448e;
-    border: 1.5px solid #98c79a;
+    background: #afc3da52;
+    color: #0b3b6a9f;
+    border: 1.5px solid #98a7c7;
     border-radius: 30px;
     padding: 5px 10px;
     font-size: 0.80em;
@@ -94,13 +96,14 @@
     margin-bottom: 10px;
     transition: background 0.2s, color 0.2s, transform 0.2s;
     outline: none;
+    font-family: 'Roboto', sans-serif;
 }
 
 .tabButtonNoti.active,
 .tabButtonNoti:hover {
-    background: #b5dba3c7;
-    color: #444444;
-    border: 1.5px solid #99cc5e;
+    background: #c4e3ffc7;
+    color: #0033a0;
+    border: 1.5px solid #5ebfffb9;
     box-shadow: 0 2px 8px #98c79a3a;
 }
 

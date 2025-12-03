@@ -7,7 +7,7 @@ import { useToast } from '../components/userToasd';
 import Spinner from '../components/spinner';
 import { BaseUrl } from '../utils/Constans';
 
-function Login () {
+function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [form, setForm] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
@@ -24,10 +24,10 @@ function Login () {
     };
 
     useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        navigate("/admin", { replace: true });
-    }
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/admin", { replace: true });
+        }
     }, [navigate]);
 
     const handleLogin = async () => {
@@ -45,7 +45,7 @@ function Login () {
             const res = await axios.post(`${BaseUrl}auth/login`, {
                 username: form.username.trim(),
                 password: form.password
-                
+
             });
 
             const { token, user, message } = res.data || {};
@@ -55,7 +55,9 @@ function Login () {
             if (user) {
                 localStorage.setItem('user', JSON.stringify(user));
             }
+            if (showToast) showToast('Bienvenido!! Recuerda Siempre Revisar tus Notificaciones', 'success');
             if (showToast) showToast(message || 'Inicio de sesión correcto', 'success');
+            if (showToast) showToast('Sesión iniciada correctamente', 'success');
             irHome();
         } catch (err) {
             const msg = err?.response?.data?.message || err.message || 'Error autenticando';
@@ -69,14 +71,14 @@ function Login () {
         <div className="loginContainer">
             <div className="cartForm">
                 <h1 className="title">
-                    <img src={icon.pulso2} alt="corazon" title='Servicios Medicos Yutong' className='icon'/>
+                    <img src={icon.pulso2} alt="corazon" title='Servicios Medicos Yutong' className='icon' />
                     Cuidarte Yutong
                 </h1>
 
                 <form className="formLogin" onSubmit={(e) => e.preventDefault()}>
                     <div className='infoLabels'>
-                        <label htmlFor="userInput"  title='Campo de Usuario'>
-                            <img src={icon.user} alt="usuario" className='icon'/>Usuario o Correo
+                        <label htmlFor="userInput" title='Campo de Usuario'>
+                            <img src={icon.user} alt="usuario" className='icon' />Usuario o Correo
                         </label>
                     </div>
                     <div className="infoGroup">
@@ -96,7 +98,7 @@ function Login () {
 
                     <div className='infoLabels'>
                         <label htmlFor="passInput" className='labels' title='Campo de Contraseña'>
-                            <img src={icon.llave} alt="contraseña" className='icon'/>Contraseña
+                            <img src={icon.llave} alt="contraseña" className='icon' />Contraseña
                         </label>
                     </div>
                     <div className="infoGroup">
@@ -132,7 +134,7 @@ function Login () {
                         {loading ? <Spinner size={18} inline label="Iniciando..." /> : 'Iniciar Sesión'}
                     </button>
 
-                    <button
+                    {/* <button
                         type="button"
                         className="btn-link"
                         title="Recuperar Contraseña"
@@ -141,7 +143,7 @@ function Login () {
                     >
                         <img src={icon.link} alt="Link" className='icon'/>
                         ¿Has Olvidado Tu Contraseña?
-                    </button>
+                    </button> */}
                 </form>
 
                 <footer className="footerCart">

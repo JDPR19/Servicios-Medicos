@@ -277,22 +277,6 @@ function ForReposos({ pacienteId, onSuccess, onCancel, reposoToEdit = null, read
                     />
                 </div>
 
-                {/* Estado (Solo visible si se edita) */}
-                {reposoToEdit && !readOnly && (
-                    <div className="fc-field">
-                        <label>Estado</label>
-                        <select
-                            name="estado"
-                            value={formData.estado}
-                            onChange={handleChange}
-                            className="form-select"
-                        >
-                            <option value="activo">Activo</option>
-                            <option value="finalizado">Finalizado</option>
-                            <option value="anulado">Anulado</option>
-                        </select>
-                    </div>
-                )}
             </div>
 
             {/* Botones */}

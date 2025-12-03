@@ -5,7 +5,6 @@ import '../index.css';
 import Card from "../components/Card";
 import Tablas from "../components/Tablas";
 import icon from "../components/icon";
-// import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import { BaseUrl } from "../utils/Constans";
@@ -14,10 +13,12 @@ import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
 import ForDoctor from "../Formularios/ForDoctor";
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
+import { generateDoctorPDF } from '../utils/pdfGenerator';
 import SingleSelect from "../components/SingleSelect";
+import { usePermiso } from '../utils/usePermiso';
 
 function Doctores() {
-  // const navigate = useNavigate();
+  const tienePermiso = usePermiso();
   const [pdfUrl, setPdfUrl] = useState(null);
   const showToast = useToast();
   const [doctorToShow, setDoctorToShow] = useState(null);
@@ -88,6 +89,19 @@ function Doctores() {
       count: true,
       totalLabel: "TOTAL DE REGISTROS"
     });
+  };
+
+  const handlePrintDoctor = (row) => {
+    try {
+      const docBlob = generateDoctorPDF(row);
+      if (docBlob) {
+        const url = URL.createObjectURL(docBlob);
+        setPdfUrl(url);
+      }
+    } catch (error) {
+      console.error("Error generando PDF:", error);
+      showToast?.("Error al generar el PDF", "error");
+    }
   };
 
   const estadoOptions = [
@@ -201,10 +215,18 @@ function Doctores() {
       header: "Acciones",
       render: (row) => (
         <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-          <button className="btn btn-xs btn-outline btn-print">Imprimir</button>
-          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          {tienePermiso('doctores', 'ver') && (
+            <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
+          )}
+          {tienePermiso('doctores', 'editar') && (
+            <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
+          )}
+          {tienePermiso('doctores', 'exportar') && (
+            <button className="btn btn-xs btn-outline btn-print" onClick={() => handlePrintDoctor(row)} title="Imprimir Ficha">Imprimir</button>
+          )}
+          {tienePermiso('doctores', 'eliminar') && (
+            <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          )}
         </div>
       )
     },
@@ -355,15 +377,21 @@ function Doctores() {
           </div>
 
           <div className="actions">
-            <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
-            </button>
-            <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
-            </button>
-            <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Doctor
-            </button>
+            {tienePermiso('doctores', 'exportar') && (
+              <button className="btn btn-secondary " onClick={handlePreviewPDF}>
+                <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
+              </button>
+            )}
+            {tienePermiso('doctores', 'exportar') && (
+              <button className="btn btn-secondary" onClick={handleExportExcel}>
+                <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
+              </button>
+            )}
+            {tienePermiso('doctores', 'crear') && (
+              <button className="btn btn-primary" onClick={handleNuevo}>
+                <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Doctor
+              </button>
+            )}
           </div>
         </div>
       </section>

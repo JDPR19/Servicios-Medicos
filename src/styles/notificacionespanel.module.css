@@ -2,32 +2,44 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(0,0,0,0.08);
+  background: rgba(0, 0, 0, 0.08);
   display: none;
 }
+
 .open {
   display: block;
 }
+
 .panel {
   position: absolute;
-  top: 90px;
+  top: 80px;
   right: 40px;
   width: 370px;
   max-width: 98vw;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,51,160,0.12), 0 1.5px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 32px rgba(0, 51, 160, 0.12), 0 1.5px 8px rgba(0, 0, 0, 0.06);
   padding: 0 0 10px 0;
   animation: fadeInPanel .22s;
   min-height: 320px;
   max-height: 70vh;
   overflow-y: auto;
   border: 1.5px solid #e6f0fa;
+  font-family: 'Roboto', sans-serif;
 }
+
 @keyframes fadeInPanel {
-  from { opacity: 0; transform: translateY(-20px);}
-  to { opacity: 1; transform: translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .header {
   display: flex;
   align-items: center;
@@ -35,12 +47,14 @@
   padding: 18px 22px 8px 22px;
   border-bottom: 1px solid #e6f0fa;
 }
+
 .title {
   font-size: 1.18rem;
   font-weight: 700;
   color: #0033A0;
   letter-spacing: 2px;
 }
+
 .closeBtn {
   background: none;
   border: none;
@@ -50,11 +64,13 @@
   font-weight: bold;
   line-height: 1;
 }
+
 .lista {
   padding: 10px 10px 0 10px;
   max-height: 50vh;
   overflow-y: auto;
 }
+
 .item {
   background: #f8fafc;
   border-radius: 10px;
@@ -65,14 +81,17 @@
   border: 1px solid transparent;
   position: relative;
 }
+
 .item:hover {
   background: #e6f0fa;
   border: 1px solid #c8d8f0;
 }
+
 .noLeida {
   background: #e6f0fa;
   border: 1.5px solid #0033A0;
 }
+
 .mensaje {
   display: block;
   font-size: 1.04rem;
@@ -80,11 +99,13 @@
   font-weight: 500;
   margin-bottom: 2px;
 }
+
 .fecha {
   font-size: 0.85rem;
   color: #888;
   font-weight: 400;
 }
+
 .dot {
   position: absolute;
   right: 14px;
@@ -95,6 +116,7 @@
   border-radius: 50%;
   border: 2px solid #fff;
 }
+
 .vacio {
   text-align: center;
   color: #888;

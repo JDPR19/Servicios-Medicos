@@ -13,6 +13,7 @@ import ojitoculto from '../assets/ojitoculto.svg';
 import admin from '../assets/admin.svg';
 import altavoz from '../assets/altavoz.svg';
 import calendario from '../assets/calendario.svg';
+import calendario2 from '../assets/calendario2.svg';
 import camionsito from '../assets/camionsito.svg';
 import candado from '../assets/candado.svg';
 import candado2 from '../assets/candado2.svg';
@@ -85,6 +86,7 @@ const icon = {
     user,
     ojito,
     ojitoculto,
+    calendario2,
     admin,
     altavoz,
     calendario,

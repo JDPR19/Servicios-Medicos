@@ -12,8 +12,10 @@ import FormModal from "../components/FormModal";
 import ForUsuarios from "../Formularios/ForUsuarios";
 import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
+import { usePermiso } from '../utils/usePermiso';
 
 function Usuarios() {
+  const tienePermiso = usePermiso();
   const [loading, setLoading] = useState(false);
   const [usuarios, setUsuarios] = useState([]);
   const [filters, setFilters] = useState({ q: "", estatus: "todos" });
@@ -123,27 +125,33 @@ function Usuarios() {
       header: "Acciones",
       render: (row) => (
         <div className="row-actions" style={{ display: "flex", gap: 8 }}>
-          <button
-            className="btn btn-xs btn-outline btn-view"
-            title="Ver Detalles"
-            onClick={() => handleView(row)}
-          >
-            Ver
-          </button>
-          <button
-            className="btn btn-xs btn-outline btn-edit"
-            title="Editar"
-            onClick={() => handleEdit(row)}
-          >
-            Editar
-          </button>
-          <button
-            className="btn btn-xs btn-outline btn-danger"
-            title="Eliminar"
-            onClick={() => openConfirmDelete(row.id)}
-          >
-            Eliminar
-          </button>
+          {tienePermiso('usuarios', 'ver') && (
+            <button
+              className="btn btn-xs btn-outline btn-view"
+              title="Ver Detalles"
+              onClick={() => handleView(row)}
+            >
+              Ver
+            </button>
+          )}
+          {tienePermiso('usuarios', 'editar') && (
+            <button
+              className="btn btn-xs btn-outline btn-edit"
+              title="Editar"
+              onClick={() => handleEdit(row)}
+            >
+              Editar
+            </button>
+          )}
+          {tienePermiso('usuarios', 'eliminar') && (
+            <button
+              className="btn btn-xs btn-outline btn-danger"
+              title="Eliminar"
+              onClick={() => openConfirmDelete(row.id)}
+            >
+              Eliminar
+            </button>
+          )}
         </div>
       )
     }
@@ -287,10 +295,12 @@ function Usuarios() {
           </div>
 
           <div className="actions">
-            <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} />
-              Nuevo Usuario
-            </button>
+            {tienePermiso('usuarios', 'crear') && (
+              <button className="btn btn-primary" onClick={handleNuevo}>
+                <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} />
+                Nuevo Usuario
+              </button>
+            )}
           </div>
         </div>
       </section>

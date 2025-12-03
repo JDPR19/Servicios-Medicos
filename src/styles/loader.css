@@ -5,11 +5,13 @@
     border-top: 4px solid var(--azul);
     animation: spin 1s linear infinite;
     margin: auto;
-    box-shadow: 0px 2px 30px 0px  rgb(148, 176, 252) inset;
+    box-shadow: 0px 2px 30px 0px rgb(148, 176, 252) inset;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .spinner-wrapper {
@@ -25,14 +27,16 @@
 .spinner-column .spinner-text {
     margin-top: 8px;
     text-align: center;
-    background: rgba(255,255,255,0.10);    /* color muy tenue */
+    background: rgba(255, 255, 255, 0.10);
+    /* color muy tenue */
     -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);            /* desenfoque del fondo detrás del contenedor */
+    backdrop-filter: blur(6px);
+    /* desenfoque del fondo detrás del contenedor */
     border-radius: 10px;
     padding: 8px 12px;
     width: auto;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.103);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     /* suavizar renderizado de texto */
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -44,10 +48,11 @@
    usa un fondo más oscuro y menos opaco para simular el efecto */
 @supports not ((-webkit-backdrop-filter: blur(6px)) or (backdrop-filter: blur(6px))) {
     .spinner-column .spinner-text {
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.08);
     }
 }
+
 .spinner-text {
     color: var(--white);
     font-weight: 500;
@@ -55,16 +60,16 @@
     line-height: 1.1;
     display: block;
     text-align: center;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     font-family: 'Roboto', sans-serif;
 }
 
-    .spinner-inline {
+.spinner-inline {
     display: inline-flex;
     vertical-align: middle;
-    }
+}
 
-    .spinner-overlay {
+.spinner-overlay {
     position: fixed;
     inset: 0;
     display: flex;
@@ -72,11 +77,11 @@
     justify-content: center;
     background: rgba(62, 93, 97, 0.39);
     z-index: 19999;
-    }
+}
 
 
 /* //////////////////////////////////////// */
-   /* ---- reglas añadidas para Pogress (auto + barra) ---- */
+/* ---- reglas añadidas para Pogress (auto + barra) ---- */
 .pogress-wrapper {
     width: 100%;
     max-width: 420px;
@@ -85,7 +90,7 @@
     align-items: center;
     gap: 8px;
     margin: 0 auto;
-    }
+}
 
 /* pista donde se mueve el auto (solo visual) */
 .pogress-bus-track {
@@ -93,7 +98,7 @@
     width: 100%;
     height: 64px;
     pointer-events: none;
-    }
+}
 
 /* auto que se desplaza; left se controla desde React */
 .pogress-bus {
@@ -103,30 +108,38 @@
     width: 56px;
     height: auto;
     transition: left 120ms linear;
-    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.12));
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
     animation: pogress-drive 1s linear infinite;
 }
 
 /* ligera oscilación para simular conducción */
-    @keyframes pogress-drive {
-    0% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
-    50% { transform: translate(-50%, -52%) rotate(0deg) translateY(-2px); }
-    100% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
+@keyframes pogress-drive {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) translateY(0);
+    }
+
+    50% {
+        transform: translate(-50%, -52%) rotate(0deg) translateY(-2px);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(0deg) translateY(0);
+    }
 }
 
-    /* fila de la barra y meta (porcentaje) */
-    .pogress-progress-row {
+/* fila de la barra y meta (porcentaje) */
+.pogress-progress-row {
     width: 100%;
     display: flex;
     gap: 12px;
     align-items: center;
-    }
+}
 
 /* barra */
-    .pogress-bar {
+.pogress-bar {
     flex: 1;
     height: 12px;
-    background: rgba(0,0,0,0.06);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 999px;
     overflow: hidden;
     position: relative;
@@ -137,11 +150,11 @@
     width: 0%;
     border-radius: 999px;
     transition: width 120ms linear;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 /* porcentaje y estilo */
-    .pogress-meta {
+.pogress-meta {
     min-width: 52px;
     display: flex;
     justify-content: flex-end;
@@ -158,19 +171,21 @@
     margin-top: 6px;
     padding: 6px 10px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.10);
+    background: rgba(255, 255, 255, 0.10);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
-    color: rgba(255,255,255,0.95);
+    color: rgba(255, 255, 255, 0.95);
     font-weight: 600;
     font-size: 0.95rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     text-align: center;
     font-family: 'Roboto', sans-serif;
 }
 
 /* fallback para navegadores sin backdrop-filter */
 @supports not ((-webkit-backdrop-filter: blur(6px)) or (backdrop-filter: blur(6px))) {
-    .pogress-label { background: rgba(255,255,255,0.12); }
+    .pogress-label {
+        background: rgba(255, 255, 255, 0.12);
+    }
 }

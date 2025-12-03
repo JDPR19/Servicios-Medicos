@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import '../styles/sidebar.css';
 import icon from '../components/icon';
 import img from '../components/imagen';
+import { usePermiso } from '../utils/usePermiso';
 
 function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
-
+    const TienePermiso = usePermiso();
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
@@ -14,16 +15,63 @@ function Sidebar() {
     const closeSidebar = () => setIsOpen(false);
 
     const links = [
-        { to: '/admin', label: 'Home', icon: icon.corazon },
-        { to: '/admin/Pacientes', label: 'Pacientes', icon: icon.user3 },
-        { to: '/admin/Consultas', label: 'Consultas', icon: icon.consulta3 },
-        { to: '/admin/Historias', label: 'Historias', icon: icon.folder },
-        { to: '/admin/Reposos', label: 'Reposos', icon: icon.mascarilla },
-        { to: '/admin/Enfermedades', label: 'Enfermedades', icon: icon.estetoscopio },
-        { to: '/admin/SeccionTwo', label: 'Stock', icon: icon.maletindoctor3 },
-        { to: '/admin/SeccionOne', label: 'Administrador', icon: icon.admin },
-        { to: '/admin/Bitacora', label: 'Bitacora', icon: icon.bitacora },
-    ];
+        TienePermiso('home', 'ver') && {
+            to: '/admin',
+            label: 'Home',
+            icon: icon.corazon
+        },
+        TienePermiso('atenciones', 'ver') && {
+            to: '/admin/Atenciones',
+            label: 'Atenciones',
+            icon: icon.altavoz
+        },
+        TienePermiso('citas', 'ver') && {
+            to: '/admin/Citas',
+            label: 'Citas',
+            icon: icon.calendario
+        },
+        TienePermiso('consulta', 'ver') && {
+            to: '/admin/Consultas',
+            label: 'Consultas',
+            icon: icon.consulta3
+        },
+        TienePermiso('pacientes', 'ver') && {
+            to: '/admin/Pacientes',
+            label: 'Pacientes',
+            icon: icon.user3
+        },
+        TienePermiso('historias', 'ver') && {
+            to: '/admin/Historias',
+            label: 'Historias',
+            icon: icon.folder
+        },
+        TienePermiso('reposos', 'ver') && {
+            to: '/admin/Reposos',
+            label: 'Reposos',
+            icon: icon.mascarilla
+        },
+        TienePermiso('enfermedades', 'ver') && {
+            to: '/admin/Enfermedades',
+            label: 'Enfermedades',
+            icon: icon.estetoscopio
+        },
+        TienePermiso('medicamentos', 'ver') && ('departamentos', 'ver') && ('finalidades', 'ver') && ('categoria_e', 'ver') && ('categoria_m', 'ver') && {
+            to: '/admin/SeccionTwo',
+            label: 'Stock',
+            icon: icon.maletindoctor3
+        },
+        TienePermiso('usuarios', 'ver') && ('roles', 'ver') && ('cargos', 'ver') && ('doctores', 'ver')
+        && ('profesiones', 'ver') && {
+            to: '/admin/SeccionOne',
+            label: 'Administrador',
+            icon: icon.admin
+        },
+        TienePermiso('bitacora', 'ver') && {
+            to: '/admin/Bitacora',
+            label: 'Bitacora',
+            icon: icon.bitacora
+        },
+    ].filter(Boolean);
 
     return (
         <>
@@ -44,7 +92,7 @@ function Sidebar() {
                     <ul className="sidebar-links">
                         {links.map((link, index) => (
                             <li key={index}>
-                                <Link to={link.to}>
+                                <Link to={link.to} onClick={closeSidebar}>
                                     <img src={link.icon} alt={link.label} className="link-icon" />
                                     {isOpen && <span>{link.label}</span>}
                                 </Link>

@@ -10,9 +10,10 @@ import InfoModal from '../components/InfoModal';
 import ConfirmModal from '../components/ConfirmModal';
 import FormModal from '../components/FormModal';
 import ForEnfermedades from '../Formularios/ForEnfermedades';
-// import '../index.css';
+import { usePermiso } from '../utils/usePermiso';
 
 function Enfermedades() {
+    const tienePermiso = usePermiso();
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
@@ -138,9 +139,15 @@ function Enfermedades() {
             header: "Acciones",
             render: (row) => (
                 <div className='row-actions' style={{ display: 'flex', gap: 8 }}>
-                    <button className='btn btn-xs btn-outline btn-view' title='Ver Detalles' onClick={() => handleView(row)}>Ver</button>
-                    <button className='btn btn-xs btn-outline btn-edit' title='Editar' onClick={() => handleEdit(row)}>Editar</button>
-                    <button className='btn btn-xs btn-outline btn-danger' title='Eliminar' onClick={() => openConfirmDelete(row.id)}>Eliminar</button>
+                    {tienePermiso('enfermedades', 'ver') && (
+                        <button className='btn btn-xs btn-outline btn-view' title='Ver Detalles' onClick={() => handleView(row)}>Ver</button>
+                    )}
+                    {tienePermiso('enfermedades', 'editar') && (
+                        <button className='btn btn-xs btn-outline btn-edit' title='Editar' onClick={() => handleEdit(row)}>Editar</button>
+                    )}
+                    {tienePermiso('enfermedades', 'eliminar') && (
+                        <button className='btn btn-xs btn-outline btn-danger' title='Eliminar' onClick={() => openConfirmDelete(row.id)}>Eliminar</button>
+                    )}
                 </div>
             )
         },
@@ -222,9 +229,11 @@ function Enfermedades() {
                     </div>
 
                     <div className='actions'>
-                        <button className='btn btn-primary' onClick={handleNuevo}>
-                            <img src={icon.user5} alt="icono de registro" className='btn-icon' style={{ marginRight: 5 }} /> Nuevo Registro
-                        </button>
+                        {tienePermiso('enfermedades', 'crear') && (
+                            <button className='btn btn-primary' onClick={handleNuevo}>
+                                <img src={icon.user5} alt="icono de registro" className='btn-icon' style={{ marginRight: 5 }} /> Nuevo Registro
+                            </button>
+                        )}
                     </div>
 
                 </div>

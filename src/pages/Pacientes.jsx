@@ -15,8 +15,10 @@ import ForPacientes from "../Formularios/ForPaciente";
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
 import { useNavigate } from "react-router-dom";
 import SingleSelect from "../components/SingleSelect";
+import { usePermiso } from '../utils/usePermiso';
 
 function Pacientes() {
+  const tienePermiso = usePermiso();
   const navigate = useNavigate();
   const [pdfUrl, setPdfUrl] = useState(null);
   const showToast = useToast();
@@ -140,7 +142,17 @@ function Pacientes() {
   };
 
   useEffect(() => {
-    fetchPacientes();
+    const updateStatuses = async () => {
+      try {
+        await axios.get(`${BaseUrl}reposos/actualizar-estados`, { headers: getAuthHeaders() });
+      } catch (error) {
+        console.error('Error actualizando estados:', error);
+      }
+    };
+
+    updateStatuses().then(() => {
+      fetchPacientes();
+    });
   }, []);
 
   const stats = useMemo(() => {
@@ -177,14 +189,14 @@ function Pacientes() {
         row.estatus === "en planta"
           ? <span className="btn btn-xs badge--success">En Planta</span>
           : row.estatus === "reposo"
-            ? <span className="btn btn-xs badge--warning">Reposo</span>
+            ? <span className="btn btn-xs badge--info">Reposo</span>
             : <span className="btn btn-xs badge--muted">{row.estatus}</span>
     },
     {
       header: "Acciones",
       render: (row) => (
         <div className="row-actions" style={{ display: 'flex', gap: 8 }}>
-          {row.has_consultas && (
+          {tienePermiso('pacientes', 'seguimiento') && row.has_consultas && (
             <button
               className="btn btn-xs btn-primary"
               onClick={() => handleSeguimiento(row)}
@@ -196,9 +208,9 @@ function Pacientes() {
             </button>
           )}
 
-          <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>
-          <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>
-          <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>
+          {tienePermiso('pacientes', 'ver') && <button className="btn btn-xs btn-outline btn-view" onClick={() => handleView(row)} title="Ver">Ver</button>}
+          {tienePermiso('pacientes', 'editar') && <button className="btn btn-xs btn-outline btn-edit" onClick={() => handleEdit(row)} title="Editar">Editar</button>}
+          {tienePermiso('pacientes', 'eliminar') && <button className="btn btn-xs btn-outline btn-danger" onClick={() => openConfirmDelete(row.id)} title="Eliminar">Eliminar</button>}
         </div>
       )
     },
@@ -337,15 +349,21 @@ function Pacientes() {
           </div>
 
           <div className="actions">
-            <button className="btn btn-secondary " onClick={handlePreviewPDF}>
-              <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
-            </button>
-            <button className="btn btn-secondary" onClick={handleExportExcel}>
-              <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
-            </button>
-            <button className="btn btn-primary" onClick={handleNuevo}>
-              <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Paciente
-            </button>
+            {tienePermiso('pacientes', 'exportar') && (
+              <button className="btn btn-secondary " onClick={handlePreviewPDF}>
+                <img src={icon.pdf1} className="btn-icon" alt="PDF" style={{ marginRight: 5 }} /> PDF
+              </button>
+            )}
+            {tienePermiso('pacientes', 'exportar') && (
+              <button className="btn btn-secondary" onClick={handleExportExcel}>
+                <img src={icon.excel} className="btn-icon" alt="EXCEL" style={{ marginRight: 5 }} /> Excel
+              </button>
+            )}
+            {tienePermiso('pacientes', 'crear') && (
+              <button className="btn btn-primary" onClick={handleNuevo}>
+                <img src={icon.user5} className="btn-icon" alt="" style={{ marginRight: 5 }} /> Nuevo Paciente
+              </button>
+            )}
           </div>
         </div>
       </section>

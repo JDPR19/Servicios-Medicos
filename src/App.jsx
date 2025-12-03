@@ -12,12 +12,15 @@ import Seguimiento from './pages/SeguimientoPaciente.jsx';
 import Reposos from './pages/Reposos.jsx';
 import Doctores from './pages/Doctores.jsx';
 import Cargos from './pages/Cargos.jsx';
+import Profesiones from './pages/Profesiones.jsx';
 import Departamentos from './pages/Departamentos';
 import Categoria_e from './pages/Categoria_e.jsx';
 import Categoria_m from './pages/Categoria_m.jsx';
 import Medicamentos from './pages/Medicamentos.jsx';
 import Bitacora from './pages/Bitacora.jsx';
 import Enfermedades from './pages/Enfermedades.jsx';
+import Citas from './pages/Citas.jsx';
+import Atenciones from './pages/Atenciones.jsx';
 ////////////////////////// PANTALLAS FORMULARIOS ///////////////////////////////////////////////////////////
 import ForConsultas from './Formularios/ForConsultas';
 import ForPacientes from './Formularios/ForPaciente.jsx';
@@ -25,10 +28,13 @@ import ForHistorias from './Formularios/ForHistorias.jsx';
 import ForReposos from './Formularios/ForReposos.jsx';
 import ForDoctor from './Formularios/ForDoctor.jsx';
 import ForCargos from './Formularios/ForCargo.jsx';
+import ForProfesiones from './Formularios/ForProfesiones.jsx';
 import ForDepartamentos from './Formularios/ForDepartamento.jsx';
 import ForMedicamentos from './Formularios/ForMedicamentos.jsx';
 import ForCategoria_e from './Formularios/ForCategoria_e.jsx';
 import ForCategoria_m from './Formularios/ForCategoria_m.jsx';
+import ForAtenciones from './Formularios/ForAtenciones.jsx';
+import ForCitas from './Formularios/ForCitas.jsx';
 ///////////////////////// COMPONENTES //////////////////////////
 import MainLayout from './components/MainLayout.jsx';
 import { AlertProvider } from './components/AlertProvider.jsx';
@@ -152,6 +158,16 @@ function App() {
                     <ForCargos />
                   </ProtectedRoute>
                 } />
+                <Route path='Profesiones' element={
+                  <ProtectedRoute pantalla='profesion'>
+                    <Profesiones />
+                  </ProtectedRoute>
+                } />
+                <Route path='ForProfesiones' element={
+                  <ProtectedRoute pantalla='profesion'>
+                    <ForProfesiones />
+                  </ProtectedRoute>
+                } />
                 <Route path='Departamentos' element={
                   <ProtectedRoute pantalla='departamentos'>
                     <Departamentos />
@@ -197,9 +213,30 @@ function App() {
                     <ForCategoria_m />
                   </ProtectedRoute>
                 } />
+
                 <Route path='Bitacora' element={
                   <ProtectedRoute pantalla='bitacora'>
                     <Bitacora />
+                  </ProtectedRoute>
+                } />
+                <Route path='Atenciones' element={
+                  <ProtectedRoute pantalla='atenciones'>
+                    <Atenciones />
+                  </ProtectedRoute>
+                } />
+                <Route path='ForAtenciones' element={
+                  <ProtectedRoute pantalla='atenciones'>
+                    <ForAtenciones />
+                  </ProtectedRoute>
+                } />
+                <Route path='Citas' element={
+                  <ProtectedRoute pantalla='citas'>
+                    <Citas />
+                  </ProtectedRoute>
+                } />
+                <Route path='ForCitas' element={
+                  <ProtectedRoute pantalla='citas'>
+                    <ForCitas />
                   </ProtectedRoute>
                 } />
               </Route>

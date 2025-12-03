@@ -3,10 +3,10 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 // import sisic from '../../public/assets/logo-sisic5.png';
-// import cintillo from '../../public/assets/cintillo insai.png'
+import cintillo from '../../src/images/cintillo.png'
 
 function getRowValues(data, columns) {
-    return data.map((row, idx)=>
+    return data.map((row, idx) =>
         columns.map(col => {
             let value = col.render ? col.render(row, idx) : row[col.key];
             if (['created_at', 'updated_at', 'fecha_notificacion'].includes(col.key)) {
@@ -37,7 +37,7 @@ export function exportToPDF({
     title = '',
     preview = false
 }) {
-    const rows = getRowValues(data, columns); // CORREGIDO: usa render
+    const rows = getRowValues(data, columns);
     const useLandscape = (columns?.length || 0) > 6;
     const doc = new jsPDF({ format: 'legal', orientation: 'landscape' });
 
@@ -50,15 +50,15 @@ export function exportToPDF({
     // Configura alturas/posiciones del header y tabla
     const CINTILLO_Y = 6;
     const CINTILLO_HEIGHT = 15;     // más flaco
-    const TITLE_Y = 30;           
+    const TITLE_Y = 30;
     const TABLE_START_Y = 40;       // más espacio antes de la tabla
 
     // Cabecera: cintillo + título
     const drawHeader = () => {
         try {
-            // const w = pageWidth - (margin.left + margin.right);
-            // doc.addImage(cintillo, 'PNG', margin.left, CINTILLO_Y, w, CINTILLO_HEIGHT);
-        } catch (e) {e}
+            const w = pageWidth - (margin.left + margin.right);
+            doc.addImage(cintillo, 'PNG', margin.left, CINTILLO_Y, w, CINTILLO_HEIGHT);
+        } catch (e) { e }
         doc.setTextColor(40, 40, 40);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
@@ -88,7 +88,7 @@ export function exportToPDF({
 
         try {
             // doc.addImage(sisic, 'PNG', x, y - imgH + 2.5, imgW, imgH);
-        } catch (e) {e}
+        } catch (e) { e }
 
         doc.text(text, x + imgW + gap, y);
     };
@@ -97,7 +97,7 @@ export function exportToPDF({
     drawHeader();
 
     const tableColumn = columns.map(col => col.header);
-    const tableRows = rows.map(row => row.map(v => v == null ? '' : String(v))); 
+    const tableRows = rows.map(row => row.map(v => v == null ? '' : String(v)));
 
     const baseFont = 10;
     const fontSize = Math.max(6, baseFont - Math.floor((columns.length - 4) / 2));
@@ -137,8 +137,8 @@ export function exportToPDF({
     const columnStyles = {};
     columns.forEach((col, idx) => {
         columnStyles[idx] = {
-            cellWidth: widths[idx], 
-            overflow: 'linebreak',     
+            cellWidth: widths[idx],
+            overflow: 'linebreak',
             halign: col.key === 'codigo' ? 'center' : 'left'
         };
     });
@@ -177,11 +177,11 @@ export function exportToPDF({
             lineWidth: 0.15,
             lineColor: [200, 200, 200]
         },
-        bodyStyles: { 
+        bodyStyles: {
             lineWidth: 0.1,
             lineColor: [200, 200, 200],
             fillColor: [255, 255, 255], // Fondo blanco
-            textColor: [40, 40, 40] 
+            textColor: [40, 40, 40]
         },
         alternateRowStyles: { fillColor: [230, 240, 250] },
         columnStyles,
@@ -217,7 +217,7 @@ export function exportToExcel({
     totalLabel = 'TOTAL',
     count = false
 }) {
-    const rows = getRowValues(data, columns); 
+    const rows = getRowValues(data, columns);
     const worksheetData = [
         columns.map(col => col.header.toUpperCase()),
         ...rows.map(row => row.map(v => v == null ? '' : String(v))) // CORREGIDO

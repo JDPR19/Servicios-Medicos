@@ -5,7 +5,7 @@ import { BaseUrl } from "../utils/Constans";
 import { useToast } from "../components/userToasd";
 import Spinner from "../components/spinner";
 import FormModal from "../components/FormModal";
-import icon from "../components/Icon";
+import icon from "../components/icon";
 import ForSignosVitales from "../Formularios/ForSignosVitales";
 import ForHistorias from "../Formularios/ForHistorias";
 import ForReposos from "../Formularios/ForReposos";
@@ -15,8 +15,10 @@ import TimelineSeguimientos from "../components/TimelineSeguimientos";
 import DetalleConsulta from "../components/DetalleConsulta";
 import "../index.css";
 import "./SeguimientoPaciente.css";
+import { usePermiso } from '../utils/usePermiso';
 
 function SeguimientoPaciente() {
+  const tienePermiso = usePermiso();
   const { id } = useParams();
   const navigate = useNavigate();
   const showToast = useToast();
@@ -216,9 +218,11 @@ function SeguimientoPaciente() {
             )}
           </div>
           <div className="card-footer-style">
-            <button className="btn btn-primary btn-sm" style={{ width: "100%" }} onClick={() => setShowHistoriaModal(true)}>
-              {historia ? "Ver Detalle / Editar" : "Crear Historia"}
-            </button>
+            {tienePermiso('seguimiento', 'crear') && (
+              <button className="btn btn-primary btn-sm" style={{ width: "100%" }} onClick={() => setShowHistoriaModal(true)}>
+                {historia ? "Ver Detalle / Editar" : "Crear Historia"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -266,6 +270,7 @@ function SeguimientoPaciente() {
           </div>
           <div className="card-footer-style">
             <div style={{ display: "flex", gap: "10px" }}>
+              
               <button
                 className="btn btn-outline btn-sm"
                 style={{ flex: 1 }}

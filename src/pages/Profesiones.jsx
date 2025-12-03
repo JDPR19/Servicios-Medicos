@@ -9,66 +9,66 @@ import { BaseUrl } from '../utils/Constans';
 import ConfirmModal from '../components/ConfirmModal';
 import InfoModal from "../components/InfoModal";
 import FormModal from "../components/FormModal";
-import ForCargo from '../Formularios/ForCargo';
+import ForProfesiones from '../Formularios/ForProfesiones';
 import { useToast } from '../components/userToasd';
 import { usePermiso } from '../utils/usePermiso';
 
-function Cargos() {
-    const TienePermiso = usePermiso();
+function Profesiones() {
     const [loading, setLoading] = useState(false);
+    const tienePermiso = usePermiso();
     const [confirmModal, setConfirmModal] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
-    const [cargos, setCargos] = useState([]);
-    const [filters, setFilters] = useState({ estado: "todos", q: "" });
-    const [selectedCargo, setSelectedCargo] = useState(null);
-    const [editCargo, setEditCargo] = useState(null);
-    const [cargosToshow, setCargosToShow] = useState(null);
+    const [profesiones, setProfesiones] = useState([]);
+    const [filters, setFilters] = useState({ q: "" });
+    const [selectedProfesion, setSelectedProfesion] = useState(null);
+    const [editProfesion, setEditProfesion] = useState(null);
+    const [profesionToShow, setProfesionToShow] = useState(null);
     const showToast = useToast();
 
     ////////////////////////////Helpers ---> Ayudantes/////////////////////////////////////////////
-    const getAuhtHeaders = () => {
+    const getAuthHeaders = () => {
         const token = (localStorage.getItem('token') || '').trim();
-        return token ? { Authorization: `Bearer ${token} ` } : {};
+        return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const openConfirmDelete = (id) => {
-        setSelectedCargo(id);
+        setSelectedProfesion(id);
         setConfirmModal(true);
     }
 
     const closeConfirmDelete = () => {
-        setSelectedCargo();
+        setSelectedProfesion(null);
         setConfirmModal(false);
     }
 
     const handleNuevo = () => {
-        setEditCargo();
+        setEditProfesion(null);
         setModalOpen(true);
     }
 
     const handleEdit = (row) => {
-        setEditCargo(row);
+        setEditProfesion(row);
         setModalOpen(true);
     }
 
     const handleSaved = () => {
-        fecthCargos();
+        fetchProfesiones();
         setModalOpen(false);
-        setEditCargo(null);
+        setEditProfesion(null);
     }
 
     const stats = useMemo(() => {
-        const total = cargos.length;
+        const total = profesiones.length;
         return { total };
-    }, [cargos]);
+    }, [profesiones]);
 
     const filtered = useMemo(() => {
         const q = filters.q.trim().toLowerCase();
-        return cargos.filter(c => {
-            const matchQ = !q || `${c.nombre}`.toLowerCase().includes(q);
+        return profesiones.filter(p => {
+            const matchQ = !q || `${p.carrera || ''} ${p.nivel || ''}`.toLowerCase().includes(q);
             return matchQ;
         });
-    }, [cargos, filters]);
+    }, [profesiones, filters]);
 
     const columns = [
         {
@@ -76,18 +76,19 @@ function Cargos() {
             key: "order",
             render: (_row, idx) => idx + 1
         },
-        { accessor: "nombre", header: "Nombre", key: "nombre" },
+        { accessor: "carrera", header: "Profesión", key: "carrera" },
+        { accessor: "nivel", header: "Nivel", key: "nivel" },
         {
             header: "Acciones",
             render: (row) => (
                 <div className='row-actions' style={{ display: 'flex', gap: 8 }}>
-                    {TienePermiso('cargos', 'ver') && (
+                    {tienePermiso('profesion', 'ver') && (
                         <button className='btn btn-xs btn-outline btn-view' title='Ver Detalles' onClick={() => handleView(row)}>Ver</button>
                     )}
-                    {TienePermiso('cargos', 'editar') && (
+                    {tienePermiso('profesion', 'editar') && (
                         <button className='btn btn-xs btn-outline btn-edit' title='Editar' onClick={() => handleEdit(row)}>Editar</button>
                     )}
-                    {TienePermiso('cargos', 'eliminar') && (
+                    {tienePermiso('profesion', 'eliminar') && (
                         <button className='btn btn-xs btn-outline btn-danger' title='Eliminar' onClick={() => openConfirmDelete(row.id)}>Eliminar</button>
                     )}
                 </div>
@@ -95,42 +96,42 @@ function Cargos() {
         },
     ];
 
-
     /////////////////////////////////////Peticiones/////////////////////////////////////////////////////////////// 
 
-    const fecthCargos = async () => {
+    const fetchProfesiones = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}cargos`, { headers: getAuhtHeaders() });
+            const response = await axios.get(`${BaseUrl}profesion`, { headers: getAuthHeaders() });
             const data = response.data;
             if (!Array.isArray(data)) {
-                console.warn('Respuesta inesperada /cargos:', data);
-                setCargos([]);
+                console.warn('Respuesta inesperada /profesion:', data);
+                setProfesiones([]);
                 showToast?.('Respuesta inesperada del servidor', 'error', 4000);
+                return;
             }
-            setCargos(data);
+            setProfesiones(data);
         } catch (error) {
-            console.error('Error obteniendo todos los cargos:', error?.response?.data || error.message);
+            console.error('Error obteniendo todas las profesiones:', error?.response?.data || error.message);
             showToast?.('Error obteniendo los datos', 'error', 3000);
-            setCargos([]);
+            setProfesiones([]);
         } finally {
             setLoading(false);
         }
     }
 
     useEffect(() => {
-        fecthCargos();
+        fetchProfesiones();
     }, []);
 
     //////////////////////////////////////Manejadores///////////////////////////////////////////////////////////
     const handleView = async (row) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BaseUrl}cargos/ver/${row.id}`, { headers: getAuhtHeaders() });
-            setCargosToShow(response.data);
+            const response = await axios.get(`${BaseUrl}profesion/ver/${row.id}`, { headers: getAuthHeaders() });
+            setProfesionToShow(response.data);
         } catch (error) {
             console.error('Error al mostrar datos:', error?.response?.data || error.message);
-            showToast('error al mostrar datos de este cargo', 'error', 3000);
+            showToast?.('Error al mostrar datos de esta profesión', 'error', 3000);
         } finally {
             setLoading(false);
         }
@@ -139,35 +140,35 @@ function Cargos() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`${BaseUrl}cargos/eliminar/${id}`, { headers: getAuhtHeaders() });
-            showToast('Cargo eliminado con exito', 'success', 3000);
-            await fecthCargos();
+            await axios.delete(`${BaseUrl}profesion/eliminar/${id}`, { headers: getAuthHeaders() });
+            showToast?.('Profesión eliminada con éxito', 'success', 3000);
+            await fetchProfesiones();
         } catch (error) {
-            console.error('Error Eliminado el cargo:', error?.response.data || error.message);
-            showToast?.('Error al Eliminar el cargo', 'error', 3000);
+            console.error('Error eliminando la profesión:', error?.response?.data || error.message);
+            showToast?.('Error al eliminar la profesión', 'error', 3000);
         } finally {
             setLoading(false);
         }
     }
     ///////////////////////////////////// fin Peticiones/////////////////////////////////////////////////////////////// 
 
-
     return (
         <div className='pac-page'>
             {loading && (
                 <div className='spinner-overlay'>
-                    <Spinner size={50} label='Cargando Cargos....' />
+                    <Spinner size={50} label='Cargando Profesiones....' />
                 </div>
             )}
 
             <InfoModal
-                isOpen={!!cargosToshow}
-                onClose={() => setCargosToShow(null)}
-                title='Información de cargo'
+                isOpen={!!profesionToShow}
+                onClose={() => setProfesionToShow(null)}
+                title='Información de Profesión'
             >
-                {cargosToshow && (
+                {profesionToShow && (
                     <ul style={{ listStyle: "none", padding: 0 }}>
-                        <li><b>Nombre del Cargo: </b>{cargosToshow.nombre}</li>
+                        <li><b>Profesión: </b>{profesionToShow.carrera}</li>
+                        <li><b>Nivel: </b>{profesionToShow.nivel}</li>
                     </ul>
                 )}
             </InfoModal>
@@ -176,57 +177,54 @@ function Cargos() {
                 isOpen={confirmModal}
                 onClose={closeConfirmDelete}
                 onConfirm={() => {
-                    handleDelete(selectedCargo);
+                    handleDelete(selectedProfesion);
                     closeConfirmDelete();
                 }}
-                title='¿Confirmación de Eliminación?'
-                message='¿Estas Seguro de eliminar este registro?'
-                confirmText='Eliminar'
-                cancelText='Cancelar'
+                title="¿Confirmación de Eliminación?"
+                message="¿Estás seguro de eliminar este registro?"
+                confirmText="Eliminar"
+                cancelText="Cancelar"
             />
 
             <FormModal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={editCargo ? 'Editar Cargo' : 'Registrar Cargo'}
+                title={editProfesion ? "Editar Profesión" : "Nueva Profesión"}
             >
-                <ForCargo
-                    initialData={editCargo}
-                    onSave={handleSaved}
-                    onClose={() => setModalOpen(false)}
+                <ForProfesiones
+                    profesionToEdit={editProfesion}
+                    onSuccess={handleSaved}
+                    onCancel={() => setModalOpen(false)}
                 />
-
             </FormModal>
 
             <section className='card-container'>
-                <Card color="#0033A0" title="Total de Cargos">
-                    <img src={icon.cv2} alt="Icono cargo" className='icon-card' />
+                <Card color="#0033A0" title="Total de Profesiones">
+                    <img src={icon.cv2} alt="Icono profesión" className='icon-card' />
                     <span className='number'>{stats.total}</span>
-                    <h3>Total • Cargos</h3>
+                    <h3>Total • Profesiones</h3>
                 </Card>
             </section>
 
             <section className='quick-actions2'>
                 <div className='pac-toolbar'>
                     <div className='filters'>
-
                         <div className='field'>
                             <img src={icon.lupa2} alt="Buscar" className='field-icon' />
                             <input
                                 type="text"
-                                placeholder='Buscar por cédula, nombre o apellido'
+                                placeholder='Buscar por profesión o nivel'
                                 value={filters.q}
                                 onChange={(e) => setFilters(f => ({ ...f, q: e.target.value }))}
                             />
                         </div>
-
                     </div>
 
                     <div className='actions'>
-                        {TienePermiso('cargos', 'crear') && (
+                        {tienePermiso('profesion', 'crear') && (
                             <button className='btn btn-primary' onClick={handleNuevo}>
                                 <img src={icon.user5} alt="Nuevo Registro" className='btn-icon' style={{ marginRight: 5 }} />
-                                Nuevo Cargo
+                                Nueva Profesión
                             </button>
                         )}
                     </div>
@@ -244,4 +242,4 @@ function Cargos() {
     );
 }
 
-export default Cargos;
+export default Profesiones;
