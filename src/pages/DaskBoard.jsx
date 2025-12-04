@@ -177,7 +177,7 @@ function DashboardPage() {
 
         {/* Tarjetas de Estadísticas */}
         <section className="stats-grid">
-          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
             <div className="stat-card" onClick={() => navigate('/admin/pacientes')} style={{ cursor: 'pointer' }}>
               <div className="stat-header">
                 <div className="stat-icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
@@ -190,7 +190,7 @@ function DashboardPage() {
             </div>
           )}
 
-          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
             <div className="stat-card" onClick={() => navigate('/admin/Historias')} style={{ cursor: 'pointer' }}>
               <div className="stat-header">
                 <div className="stat-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}>
@@ -202,7 +202,8 @@ function DashboardPage() {
               <div className="stat-trend">Expedientes digitales</div>
             </div>
           )}
-          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
             <div className="stat-card" onClick={() => navigate('/admin/Consultas')} style={{ cursor: 'pointer' }}>
               <div className="stat-header">
                 <div className="stat-icon-wrapper" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}>
@@ -214,7 +215,8 @@ function DashboardPage() {
               <div className="stat-trend trend-up">+{stats.estadisticas.consultasHoy} hoy</div>
             </div>
           )}
-          {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
             <div className="stat-card" onClick={() => navigate('/admin/Medicamentos')} style={{ cursor: 'pointer' }}>
               <div className="stat-header">
                 <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
@@ -230,7 +232,7 @@ function DashboardPage() {
 
         {/* Gráficos */}
         <section className="charts-grid">
-          {tienePermiso('ver', 'home') && ('graficas', 'home') && (
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'graficas') && (
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Consultas por Semana</h3>
@@ -241,7 +243,7 @@ function DashboardPage() {
             </div>
           )}
 
-          {tienePermiso('ver', 'home') && ('grafica', 'home') && (
+          {tienePermiso('home', 'ver') && tienePermiso('home', 'graficas') && (
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Pacientes por Departamento</h3>
@@ -254,7 +256,7 @@ function DashboardPage() {
         </section>
 
         {/* Actividad Reciente */}
-        {tienePermiso('ver', 'home') && ('actividad', 'home') && (
+        {tienePermiso('home', 'ver') && tienePermiso('home', 'actividad') && (
           <div className="sidebar-section">
             <h3 className="sidebar-title">Actividad Reciente</h3>
             <div className="info-list">
@@ -283,7 +285,7 @@ function DashboardPage() {
       {/* Columna Lateral */}
       <div className="dashboard-sidebar">
         {/* Acciones Rápidas */}
-        {tienePermiso('ver', 'home') && ('navegar', 'home') && (
+        {tienePermiso('home', 'ver') && tienePermiso('home', 'navegar') && (
           <div className="sidebar-section">
             <h3 className="sidebar-title">Acciones Rápidas</h3>
             <div className="quick-actions-grid">
