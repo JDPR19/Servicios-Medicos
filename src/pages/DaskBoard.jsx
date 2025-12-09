@@ -352,7 +352,7 @@ function DashboardPage() {
                   <div className="info-content">
                     <span className="info-text" style={{ fontWeight: 600 }}>{med.nombre} {med.presentacion}</span>
                     <span className="info-subtext" style={{ color: '#ef4444' }}>
-                      Solo {med.cantidad_disponible} unidades
+                      {med.cantidad_disponible} unidades
                     </span>
                   </div>
                 </div>

@@ -16,6 +16,7 @@ import DetalleConsulta from "../components/DetalleConsulta";
 import "../index.css";
 import "./SeguimientoPaciente.css";
 import { usePermiso } from '../utils/usePermiso';
+import { generateFichaPacientePDF, generateInformeSeguimientoPDF, generateHistorialMedicamentosPDF } from "../utils/pdfGenerator";
 
 function SeguimientoPaciente() {
   const tienePermiso = usePermiso();
@@ -28,6 +29,7 @@ function SeguimientoPaciente() {
   const [signos, setSignos] = useState([]);
   const [reposos, setReposos] = useState([]);
   const [seguimientos, setSeguimientos] = useState([]);
+  const [medicamentos, setMedicamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSignosModal, setShowSignosModal] = useState(false);
   const [showSignosDetailModal, setShowSignosDetailModal] = useState(false);
@@ -38,7 +40,9 @@ function SeguimientoPaciente() {
   const [reposoSeleccionado, setReposoSeleccionado] = useState(null);
   const [seguimientoSeleccionado, setSeguimientoSeleccionado] = useState(null);
   const [showConsultaModal, setShowConsultaModal] = useState(false);
+
   const [consultaIdSeleccionada, setConsultaIdSeleccionada] = useState(null);
+  const [consultas, setConsultas] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -59,6 +63,8 @@ function SeguimientoPaciente() {
       await fetchSignosVitales();
       await fetchReposos();
       await fetchSeguimientos();
+      await fetchConsultas();
+      await fetchMedicamentos();
 
       setLoading(false);
     } catch (error) {
@@ -98,6 +104,28 @@ function SeguimientoPaciente() {
       setSeguimientos(seguimientosRes.data || []);
     } catch (e) {
       console.log("Error al cargar seguimientos", e);
+    }
+  };
+
+  const fetchConsultas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const consultasRes = await axios.get(`${BaseUrl}consultas/paciente/${id}`, { headers });
+      setConsultas(consultasRes.data || []);
+    } catch (e) {
+      console.log("Error al cargar consultas", e);
+    }
+  };
+
+  const fetchMedicamentos = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get(`${BaseUrl}medicamentos/paciente/${id}`, { headers });
+      setMedicamentos(res.data || []);
+    } catch (e) {
+      console.log("Error al cargar historial de medicamentos", e);
     }
   };
 
@@ -148,6 +176,16 @@ function SeguimientoPaciente() {
     setShowConsultaModal(true);
   };
 
+  const handleDescargarFichaMedicamentos = () => {
+    if (paciente && medicamentos.length > 0) {
+      const blob = generateHistorialMedicamentosPDF({ paciente, medicamentos });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } else {
+      showToast?.("No hay datos de medicamentos para generar la ficha", "info");
+    }
+  };
+
   if (loading) {
     return (
       <div className="spinner-overlay">
@@ -188,9 +226,31 @@ function SeguimientoPaciente() {
             </div>
           </div>
         </div>
-        <button className="btn btn-outline" onClick={() => navigate("/admin/Pacientes")}>
-          ← Volver
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button className="btn btn-secondary" onClick={() => {
+            if (paciente) {
+              const bolb = generateInformeSeguimientoPDF({ paciente, consultas, reposos, seguimientos });
+              const url = URL.createObjectURL(bolb);
+              window.open(url, '_blank');
+            }
+          }}>
+            <img src={icon.pdf1} alt="pdf" style={{ width: 18, marginRight: 5, filter: 'brightness(0) invert(1)' }} />
+            Informe
+          </button>
+          <button className="btn btn-primary" onClick={() => {
+            if (paciente) {
+              const bolb = generateFichaPacientePDF({ paciente, historia, signos, reposos });
+              const url = URL.createObjectURL(bolb);
+              window.open(url, '_blank');
+            }
+          }}>
+            <img src={icon.pdf1} alt="pdf" style={{ width: 18, marginRight: 5, filter: 'brightness(0) invert(1)' }} />
+            Ficha
+          </button>
+          <button className="btn btn-outline" onClick={() => navigate("/admin/Pacientes")}>
+            ← Volver
+          </button>
+        </div>
       </div>
 
       <div className="modules-grid">
@@ -270,7 +330,7 @@ function SeguimientoPaciente() {
           </div>
           <div className="card-footer-style">
             <div style={{ display: "flex", gap: "10px" }}>
-              
+
               <button
                 className="btn btn-outline btn-sm"
                 style={{ flex: 1 }}
@@ -411,6 +471,41 @@ function SeguimientoPaciente() {
                 Registrar
               </button>
             </div>
+          </div>
+        </div>
+
+        <div className="card-module card-style">
+          <div className="card-header-style">
+            <img src={(icon.pastillas && icon.pastillas !== "") ? icon.pastillas : icon.maletindoctor4} alt="Medicamentos" style={{ width: 24 }} />
+            <h3 style={{ margin: 0 }}>Medicamentos Suministrados</h3>
+          </div>
+          <div style={{ flex: 1, padding: "15px", color: "#555", fontSize: "14px", overflowY: 'auto', maxHeight: '250px' }}>
+            {medicamentos.length > 0 ? (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {medicamentos.slice(0, 5).map((med, idx) => (
+                  <li key={idx} style={{ marginBottom: '10px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
+                    <div style={{ fontWeight: 'bold', color: '#333' }}>{med.medicamento} ({med.cantidad})</div>
+                    <div style={{ fontSize: '12px', color: '#777' }}>
+                      {new Date(med.fecha).toLocaleDateString()} - {med.consulta_codigo}
+                    </div>
+                  </li>
+                ))}
+                {medicamentos.length > 5 && <li style={{ textAlign: 'center', color: '#888', fontStyle: 'italic' }}>... y {medicamentos.length - 5} mpas</li>}
+              </ul>
+            ) : (
+              <p>No hay registro de medicamentos suministrados.</p>
+            )}
+          </div>
+          <div className="card-footer-style">
+            <button
+              className="btn btn-outline btn-sm"
+              style={{ width: '100%' }}
+              disabled={medicamentos.length === 0}
+              onClick={handleDescargarFichaMedicamentos}
+            >
+              <img src={icon.pdf1} alt="pdf" style={{ width: 14, marginRight: 5, verticalAlign: 'middle' }} />
+              Descargar Ficha Única
+            </button>
           </div>
         </div>
 

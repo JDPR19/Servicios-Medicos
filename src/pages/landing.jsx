@@ -100,11 +100,11 @@ function Landing() {
         <div className="container statsInner">
           <div className="stat">
             <span className="statNum">Integridad</span>
-            <span className="statLabel"> • Y Auditoria de Movimientos</span>
+            {/* <span className="statLabel"> • Y Auditoria de Movimientos</span> */}
           </div>
           <div className="stat">
-            <span className="statNum">La Mejor</span>
-            <span className="statLabel"> • Atención Y Disponibilidad</span>
+            <span className="statNum">Atención y Disponibilidad</span>
+            {/* <span className="statLabel"> • Atención Y Disponibilidad</span> */}
           </div>
           <div className="stat">
             <span className="statNum">100%</span>
@@ -113,7 +113,7 @@ function Landing() {
         </div>
       </section>
 
-      <section className="testimonials container">
+      {/* <section className="testimonials container">
         <article className="testimonial">
           <p>“Centralizamos todo en un solo sistema y la atención mejoró notablemente.”</p>
           <span className="by">— Coordinación Médica</span>
@@ -122,7 +122,7 @@ function Landing() {
           <p>“Reportes claros y trazabilidad completa. Auditorías más simples.”</p>
           <span className="by">— Gestión de Talento</span>
         </article>
-      </section>
+      </section> */}
 
       <section className="cta">
         <div className="container ctaInner">

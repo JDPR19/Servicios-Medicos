@@ -113,7 +113,7 @@ function Medicamentos() {
   const estatusOptions = [
     { value: "todos", label: "Estatus" },
     { value: "disponible", label: "Disponible" },
-    { value: "por acabar", label: "Por acabar" },
+    { value: "existencia baja", label: "Existencia Baja" },
     { value: "agotado", label: "Agotado" }
   ];
 
@@ -130,7 +130,7 @@ function Medicamentos() {
   const stats = useMemo(() => {
     const total = medicamentos.length;
     const disponibles = medicamentos.filter(m => m.estatus === "disponible").length;
-    const porAcabar = medicamentos.filter(m => m.estatus === "por acabar").length;
+    const porAcabar = medicamentos.filter(m => m.estatus === "existencia baja").length;
     const agotados = medicamentos.filter(m => m.estatus === "agotado").length;
     return { total, disponibles, porAcabar, agotados };
   }, [medicamentos]);
@@ -147,7 +147,7 @@ function Medicamentos() {
       render: (row) => {
         const mapClass = {
           disponible: "badge--success",
-          "por acabar": "badge--warn",
+          "existencia baja": "badge--warn",
           agotado: "badge--drop"
         }[row.estatus] || "badge--muted";
         return <span className={`btn btn-xs ${mapClass}`}>{row.estatus || "-"}</span>;
@@ -280,10 +280,10 @@ function Medicamentos() {
           <span className="number">{stats.disponibles}</span>
           <h3>Disponibles</h3>
         </Card>
-        <Card color="#FF8C00" title="Por Acabar">
+        <Card color="#FF8C00" title="Existencia Baja">
           <img src={icon.agotar} alt="" className="icon-card" />
           <span className="number">{stats.porAcabar}</span>
-          <h3>Por Acabar</h3>
+          <h3>Existencia Baja</h3>
         </Card>
         <Card color="#CE1126" title="Agotados">
           <img src={icon.agotado} alt="" className="icon-card" />

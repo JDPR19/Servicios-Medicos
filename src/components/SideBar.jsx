@@ -50,12 +50,17 @@ function Sidebar() {
             label: 'Reposos',
             icon: icon.mascarilla
         },
-        TienePermiso('enfermedades', 'ver') && {
-            to: '/admin/Enfermedades',
+        TienePermiso('enfermedades', 'ver') && ('categoria_e', 'ver') && {
+            to: '/admin/SeccionThree',
             label: 'Enfermedades',
             icon: icon.estetoscopio
         },
-        TienePermiso('medicamentos', 'ver') && ('departamentos', 'ver') && ('finalidades', 'ver') && ('categoria_e', 'ver') && ('categoria_m', 'ver') && {
+        // TienePermiso('enfermedades', 'ver') && {
+        //     to: '/admin/Enfermedades',
+        //     label: 'Enfermedades',
+        //     icon: icon.estetoscopio
+        // },
+        TienePermiso('medicamentos', 'ver') && ('categoria_m', 'ver') && {
             to: '/admin/SeccionTwo',
             label: 'Stock',
             icon: icon.maletindoctor3

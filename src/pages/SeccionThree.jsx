@@ -3,26 +3,24 @@ import { useSearchParams } from 'react-router-dom';
 import TabsFiltro from '../components/TabsFiltro';
 import { usePermiso } from '../utils/usePermiso';
 import '../index.css';
-import Medicamentos from '../pages/Medicamentos';
-import Categoria_m from './Categoria_m';
-import BalanceMedicamentos from './BalanceMedicamentos';
+import Enfermedades from './Enfermedades';
+import Categoria_e from './Categoria_e';
 
-function SeccionTwo() {
+function SeccionThree() {
     const tienePermiso = usePermiso();
     const [searchParams] = useSearchParams();
 
     const tabs = useMemo(() => {
         const t = [
-            tienePermiso("medicamentos", "ver") && { key: "medicamentos", label: "Medicamentos" },
-            tienePermiso("medicamentos", "ver") && { key: "balance", label: "Balance Stock" }, // Reusamos permiso de ver medicamentos o el que aplique
-            tienePermiso("categoria_m", "ver") && { key: "categoria_m", label: "Categoria Medicamentos" },
+            tienePermiso("enfermedades", "ver") && { key: "enfermedades", label: "Enfermedades" },
+            tienePermiso("categoria_e", "ver") && { key: "categoria_e", label: "Categoria Patologias" },
         ].filter(Boolean);
         return t.length ? t : [{ key: "no-access", label: "Sin acceso" }]
     }, [tienePermiso]);
 
     const getInitialTab = () => {
         const paramTab = searchParams.get("tab");
-        const saved = paramTab || localStorage.getItem("SeccionTwo");
+        const saved = paramTab || localStorage.getItem("SeccionThree");
         const keys = new Set(tabs.map((t) => t.key));
         return keys.has(saved) ? saved : tabs[0].key;
     }
@@ -34,7 +32,7 @@ function SeccionTwo() {
         const keys = new Set(tabs.map((t) => t.key));
         if (paramTab && keys.has(paramTab) && paramTab !== activeTab) {
             setActiveTab(paramTab);
-            localStorage.setItem("SeccionTwo", paramTab);
+            localStorage.setItem("SeccionThree", paramTab);
         }
     }, [searchParams, tabs, activeTab]);
 
@@ -42,16 +40,14 @@ function SeccionTwo() {
         const key = typeof tab === "string" ? tab : tab?.key;
         if (!key) return;
         setActiveTab(key);
-        localStorage.setItem("SeccionTwo", key);
+        localStorage.setItem("SeccionThree", key);
     }
 
     let tablaRenderizada = null;
-    if (activeTab === "medicamentos" && tabs.some(t => t.key === "medicamentos")) {
-        tablaRenderizada = <Medicamentos />;
-    } else if (activeTab === "categoria_m" && tabs.some(t => t.key === "categoria_m")) {
-        tablaRenderizada = <Categoria_m />;
-    } else if (activeTab === "balance" && tabs.some(t => t.key === "balance")) {
-        tablaRenderizada = <BalanceMedicamentos />;
+    if (activeTab === "enfermedades" && tabs.some(t => t.key === "enfermedades")) {
+        tablaRenderizada = <Enfermedades />;
+    } else if (activeTab === "categoria_e" && tabs.some(t => t.key === "categoria_e")) {
+        tablaRenderizada = <Categoria_e />;
     }
 
     if (activeTab === "no-access") {
@@ -72,4 +68,4 @@ function SeccionTwo() {
     );
 }
 
-export default SeccionTwo;
+export default SeccionThree;

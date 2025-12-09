@@ -85,6 +85,7 @@ function Header() {
     '/admin/ForReposos': 'Nuevo Reposo',
     '/admin/SeccionOne': 'Administrador',
     '/admin/SeccionTwo': 'Stock de Inventario',
+    '/admin/SeccionThree': 'Catalogo de Enfermedades',
     '/admin/Bitacora': 'Bitacora del Sistema',
     '/admin/Enfermedades': 'Patologías',
     '/admin/Citas': 'Citas',

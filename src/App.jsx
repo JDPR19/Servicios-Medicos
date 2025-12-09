@@ -44,6 +44,7 @@ import ProtectedRoute from './utils/ProtectedRoute.jsx';
 ////////////////////////// IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////////////////////////
 import SeccionOne from './pages/SeccionOne.jsx';
 import SeccionTwo from './pages/SeccionTwo.jsx';
+import SeccionThree from './pages/SeccionThree.jsx';
 ////////////////////////// FIN IMPORTACIONES DE SECCIONES DE PANTALLAS//////////////////////////////////////////
 //////////////////////////IMPORTACIONES DE PANTALLAS DE ERRORES Y SEGURIDAD PARA RUTAS//////////////////////////
 import Error from './pages/Error.jsx';
@@ -146,6 +147,11 @@ function App() {
                 <Route path='SeccionTwo' element={
                   <ProtectedRoute pantalla='home'>
                     <SeccionTwo />
+                  </ProtectedRoute>
+                } />
+                <Route path='SeccionThree' element={
+                  <ProtectedRoute pantalla='home'>
+                    <SeccionThree />
                   </ProtectedRoute>
                 } />
                 <Route path='Cargos' element={

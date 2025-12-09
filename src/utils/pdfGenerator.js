@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import cintillo from '../images/cintillo.png';
 
 
@@ -515,6 +516,510 @@ export function generateHistoriaClinicaPDF(historia) {
     return doc.output('blob');
 }
 
+// ==================== FICHA COMPLETA DEL PACIENTE ====================
+export function generateFichaPacientePDF(data) {
+    const { paciente, historia, signos, reposos } = data;
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+
+    // --- Configuración ---
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - (margin * 2);
+    let y = margin;
+
+    // --- Header (Cintillo) ---
+    try {
+        const imgWidth = contentWidth;
+        const imgHeight = 20;
+        doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
+        y += imgHeight + 15;
+    } catch (e) {
+        y += 25;
+    }
+
+    // --- Título ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(0, 51, 160);
+    doc.text('FICHA DE PACIENTE', pageWidth / 2, y, { align: 'center' });
+    y += 15;
+
+    // --- SECCIÓN I: DATOS PERSONALES ---
+    doc.setFillColor(0, 51, 160);
+    doc.rect(margin, y, contentWidth, 8, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 255, 255);
+    doc.text('I. INFORMACIÓN PERSONAL', margin + 3, y + 5.5);
+    y += 15;
+
+    doc.setTextColor(0);
+    // Fila 1
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Nombre Completo:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${paciente.nombre || ''} ${paciente.apellido || ''}`.toUpperCase(), margin + 35, y);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cédula:', margin + 110, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(paciente.cedula || 'N/A', margin + 125, y);
+    y += 8;
+
+    // Fila 2
+    doc.setFont('helvetica', 'bold');
+    doc.text('Fecha Nacimiento:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const fechaNac = paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-VE') : 'N/A';
+    doc.text(fechaNac, margin + 35, y);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Edad:', margin + 70, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${paciente.edad || 'N/A'} años`, margin + 82, y);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sexo:', margin + 110, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(paciente.sexo || 'N/A', margin + 125, y);
+    y += 8;
+
+    // Fila 3
+    doc.setFont('helvetica', 'bold');
+    doc.text('Teléfono:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(paciente.contacto || 'N/A', margin + 35, y);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Correo:', margin + 110, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(paciente.correo || 'N/A', margin + 125, y);
+    y += 8;
+
+    // Fila 4: Código Territorial y Ubicación (Inicio)
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cód. Territorial:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(paciente.codigo_territorial || 'N/A', margin + 35, y);
+    y += 8;
+
+    // Fila 5: Ubicación
+    doc.setFont('helvetica', 'bold');
+    doc.text('Ubicación:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const ubicacion = paciente.ubicacion || 'No registrada';
+    const splitUbicacion = doc.splitTextToSize(ubicacion, contentWidth - 35);
+    doc.text(splitUbicacion, margin + 35, y);
+    y += (splitUbicacion.length * 6) + 10;
+
+    // --- SECCIÓN II: INFORMACIÓN CLÍNICA BÁSICA ---
+    doc.setFillColor(0, 51, 160);
+    doc.rect(margin, y, contentWidth, 8, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 255, 255);
+    doc.text('II. RESUMEN CLÍNICO', margin + 3, y + 5.5);
+    y += 15;
+
+    doc.setTextColor(0);
+
+    // Signos Vitales Recientes
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Últimos Signos Vitales Registrados:', margin, y);
+    y += 6;
+
+    if (signos && signos.length > 0) {
+        const ultimos = signos[0];
+        const fechaSignos = new Date(ultimos.fecha_registro).toLocaleDateString('es-VE');
+
+        // Tabla simple de signos
+        const startX = margin + 5;
+        const boxWidth = (contentWidth - 10) / 3;
+        const boxHeight = 12;
+
+        // Fila 1 de cajas
+        doc.rect(startX, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100);
+        doc.text('Presión Arterial', startX + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0); doc.setFont('helvetica', 'bold');
+        doc.text(ultimos.presion_arterial || '--', startX + 2, y + 9);
+
+        doc.rect(startX + boxWidth, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Frecuencia Cardíaca', startX + boxWidth + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.frecuencia_cardiaca || '--'} bpm`, startX + boxWidth + 2, y + 9);
+
+        doc.rect(startX + (boxWidth * 2), y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Temperatura', startX + (boxWidth * 2) + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.temperatura || '--'} °C`, startX + (boxWidth * 2) + 2, y + 9);
+
+        y += boxHeight;
+        // Fila 2 de cajas
+        doc.rect(startX, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Peso', startX + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.peso || '--'} kg`, startX + 2, y + 9);
+
+        doc.rect(startX + boxWidth, y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Saturación O2', startX + boxWidth + 2, y + 4);
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`${ultimos.saturacion_oxigeno || '--'} %`, startX + boxWidth + 2, y + 9);
+
+        doc.rect(startX + (boxWidth * 2), y, boxWidth, boxHeight);
+        doc.setFontSize(8); doc.setTextColor(100); doc.setFont('helvetica', 'bold');
+        doc.text('Fecha Registro', startX + (boxWidth * 2) + 2, y + 4);
+        doc.setFontSize(10); doc.setTextColor(0);
+        doc.text(fechaSignos, startX + (boxWidth * 2) + 2, y + 9);
+
+        y += boxHeight + 10;
+    } else {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('No hay registros de signos vitales disponibles.', margin, y);
+        y += 10;
+    }
+
+    // Historia Médica Resumen
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Historia Médica:', margin, y);
+    y += 6;
+
+    if (historia) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Código de Historia:', margin, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(historia.codigo || 'N/A', margin + 35, y);
+        y += 5;
+
+        if (historia.diagnostico) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('Último Diagnóstico:', margin, y);
+            y += 5;
+            doc.setFont('helvetica', 'normal');
+            const splitDiag = doc.splitTextToSize(historia.diagnostico, contentWidth);
+            doc.text(splitDiag, margin, y);
+            y += (splitDiag.length * 5) + 5;
+        }
+    } else {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('El paciente no posee una historia médica activa registrada.', margin, y);
+        y += 10;
+    }
+
+    // --- SITUACIÓN ACTUAL Y REPOSOS ---
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(margin, y, pageWidth - margin, y); // Separator line
+    y += 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Estatus Actual del Paciente:', margin, y);
+
+    // Determine status text/color
+    const estatusTexto = paciente.estatus ? paciente.estatus.toUpperCase() : 'NO DEFINIDO';
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(estatusTexto === 'REPOSO' ? 200 : 0, estatusTexto === 'REPOSO' ? 0 : 100, 0); // Red if reposo, Green/Dark otherwise
+    doc.text(estatusTexto, margin + 50, y);
+    doc.setTextColor(0); // Reset color
+    y += 8;
+
+    // Check for active reposo
+    const activeReposo = reposos && reposos.find(r => r.estado === 'activo');
+
+    if (activeReposo) {
+        doc.setFillColor(240, 248, 255); // Light blue background for reposo box
+        doc.rect(margin, y, contentWidth, 35, 'F');
+        doc.setDrawColor(0, 51, 160);
+        doc.rect(margin, y, contentWidth, 35, 'S');
+
+        y += 6;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 51, 160);
+        doc.text('REPOSO MÉDICO ACTIVO', margin + 5, y);
+        doc.setTextColor(0);
+
+        y += 6;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Código:', margin + 5, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(activeReposo.codigo || 'N/A', margin + 25, y);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Vigencia:', margin + 70, y);
+        doc.setFont('helvetica', 'normal');
+        const inicio = new Date(activeReposo.fecha_inicio).toLocaleDateString('es-VE');
+        const fin = new Date(activeReposo.fecha_fin).toLocaleDateString('es-VE');
+        doc.text(`${inicio} al ${fin} (${activeReposo.dias_reposo} días)`, margin + 90, y);
+
+        y += 6;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Diagnóstico:', margin + 5, y);
+        doc.setFont('helvetica', 'normal');
+        const diagReposo = activeReposo.diagnostico || 'Sin diagnóstico especificado';
+        // Truncate if too long for one line in this compact view
+        const splitDiagR = doc.splitTextToSize(diagReposo, contentWidth - 30);
+        doc.text(splitDiagR[0] + (splitDiagR.length > 1 ? '...' : ''), margin + 25, y);
+
+        y += 18; // Move past box
+    } else {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('No hay reposos médicos activos registrados al momento de la emisión.', margin, y);
+        y += 10;
+    }
+
+    // Footer
+    const totalPages = doc.internal.getNumberOfPages();
+    const fechaGeneracion = new Date().toLocaleDateString('es-VE', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(7);
+        doc.setTextColor(120);
+        doc.text(`Ficha de Paciente - Yutong Venezuela • Generado: ${fechaGeneracion}`, margin, pageHeight - 7);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 7, { align: 'right' });
+    }
+
+    return doc.output('blob');
+}
+
+// ==================== INFORME DE SEGUIMIENTO Y ESTADÍSTICAS ====================
+export function generateInformeSeguimientoPDF(data) {
+    const { paciente, consultas = [], reposos = [], seguimientos = [] } = data;
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+
+    // --- Configuración General ---
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - (margin * 2);
+    let y = margin;
+
+    // --- Header ---
+    try {
+        doc.addImage(cintillo, 'PNG', margin, y, contentWidth, 20);
+        y += 35;
+    } catch (e) { y += 25; }
+
+    // --- Título y Paciente ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(0, 51, 160);
+    doc.text('INFORME DE SEGUIMIENTO Y ESTADÍSTICAS', pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Paciente: ${paciente.nombre} ${paciente.apellido} (C.I: ${paciente.cedula})`, pageWidth / 2, y, { align: 'center' });
+    y += 5;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Fecha de Emisión: ${new Date().toLocaleDateString('es-VE')}`, pageWidth / 2, y, { align: 'center' });
+    y += 15;
+
+    // --- SECCIÓN 1: ESTADÍSTICAS GENERALES ---
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, y, contentWidth, 25, 'F');
+    doc.setDrawColor(200);
+    doc.rect(margin, y, contentWidth, 25, 'S');
+
+    const totalConsultas = consultas.length;
+    const totalReposos = reposos.length;
+    const totalSeguimientos = seguimientos.length;
+    // Calcular total días reposo
+    const totalDiasReposo = reposos.reduce((total, r) => total + (parseInt(r.dias_reposo) || 0), 0);
+
+    let statY = y + 15;
+    // Columna 1
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.text(totalConsultas.toString(), margin + 25, statY, { align: 'center' });
+    doc.setFontSize(9); doc.setTextColor(80);
+    doc.text('Consultas', margin + 25, statY + 5, { align: 'center' });
+
+    // Columna 2
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.text(totalReposos.toString(), margin + 75, statY, { align: 'center' });
+    doc.setFontSize(9); doc.setTextColor(80);
+    doc.text('Reposos', margin + 75, statY + 5, { align: 'center' });
+
+    // Columna 3
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 51, 160); doc.setFontSize(16);
+    doc.text(totalSeguimientos.toString(), margin + 125, statY, { align: 'center' });
+    doc.setFontSize(9); doc.setTextColor(80);
+    doc.text('Seguimientos', margin + 125, statY + 5, { align: 'center' });
+
+    // Columna 4
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(220, 53, 69); doc.setFontSize(16);
+    doc.text(totalDiasReposo.toString(), margin + 170, statY, { align: 'center' });
+    doc.setFontSize(9); doc.setTextColor(80);
+    doc.text('Días de Reposo', margin + 170, statY + 5, { align: 'center' });
+
+    y += 35;
+
+    // --- SECCIÓN 2: HISTÓRICO DE REPOSOS ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text('HISTÓRICO DE REPOSOS', margin, y);
+    y += 5;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 51, 160);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    if (reposos.length > 0) {
+        // Table Header
+        doc.setFillColor(0, 51, 160);
+        doc.rect(margin, y, contentWidth, 8, 'F');
+        doc.setFontSize(9); doc.setTextColor(255); doc.setFont('helvetica', 'bold');
+        doc.text('Código', margin + 2, y + 5.5);
+        doc.text('Periodo', margin + 40, y + 5.5);
+        doc.text('Duración', margin + 95, y + 5.5);
+        doc.text('Estatus / Motivo Fin', margin + 130, y + 5.5);
+        y += 8;
+
+        doc.setTextColor(0); doc.setFont('helvetica', 'normal');
+        reposos.forEach((repo, index) => {
+            if (y > pageHeight - 30) {
+                doc.addPage();
+                y = margin + 10;
+            }
+
+            const fechaInicio = new Date(repo.fecha_inicio).toLocaleDateString('es-VE');
+            const fechaFin = new Date(repo.fecha_fin).toLocaleDateString('es-VE');
+
+            // Alternar color de fila
+            if (index % 2 !== 0) {
+                doc.setFillColor(245, 245, 245);
+                doc.rect(margin, y, contentWidth, 8, 'F');
+            }
+
+            doc.text(repo.codigo || '-', margin + 2, y + 5);
+            doc.text(`${fechaInicio} al ${fechaFin}`, margin + 40, y + 5);
+
+            let duracion = `${repo.dias_reposo} días`;
+            if (repo.hora_fin) duracion += ` (hasta ${repo.hora_fin})`;
+            doc.text(duracion, margin + 95, y + 5);
+
+            // Logic for "por qué lo sacaron" (observacion or status logic)
+            let estadoInfo = repo.estado ? repo.estado.toUpperCase() : 'N/A';
+            if (repo.estado === 'finalizado' && repo.observacion) {
+                const obsShort = repo.observacion.length > 25 ? repo.observacion.substring(0, 22) + '...' : repo.observacion;
+                estadoInfo += `: ${obsShort}`;
+            }
+            doc.text(estadoInfo, margin + 130, y + 5);
+
+            y += 8;
+        });
+    } else {
+        doc.setFontSize(10); doc.setTextColor(100); doc.setFont('helvetica', 'italic');
+        doc.text('No hay reposos registrados.', margin, y + 5);
+        y += 10;
+    }
+
+    y += 15;
+
+    // --- SECCIÓN 3: CONSULTAS Y SUS SEGUIMIENTOS ---
+    if (y > pageHeight - 40) { doc.addPage(); y = margin + 10; }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text('CONSULTAS Y SEGUIMIENTOS ASOCIADOS', margin, y);
+    y += 5;
+    doc.setDrawColor(0, 51, 160);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    if (consultas.length > 0) {
+        consultas.forEach((cons, i) => {
+            if (y > pageHeight - 40) { doc.addPage(); y = margin + 10; }
+
+            // Consultation Card Background
+            doc.setFillColor(250, 250, 250);
+            doc.setDrawColor(200);
+            const cardStartY = y;
+            doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
+
+            // Date
+            doc.setFontSize(10); doc.setTextColor(0); doc.setFont('helvetica', 'bold');
+            const fechaCons = new Date(cons.fecha_atencion || cons.fecha_consulta || Date.now()).toLocaleDateString('es-VE');
+            doc.text(`Consulta: ${fechaCons}`, margin + 5, y + 6);
+
+            // Diagnosis
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+            const diagCons = cons.diagnostico || 'Sin diagnóstico registrado';
+            const diagText = diagCons.length > 90 ? diagCons.substring(0, 87) + '...' : diagCons;
+            doc.text(`Diagnóstico: ${diagText}`, margin + 5, y + 11);
+
+            y += 20; // Move well below the consultation card
+
+            // Find related seguimientos
+            const segsAsociados = seguimientos.filter(s => s.consulta_id === cons.id);
+
+            if (segsAsociados.length > 0) {
+                segsAsociados.forEach(seg => {
+                    if (y > pageHeight - 25) { doc.addPage(); y = margin + 15; }
+
+                    // Indentation guide
+                    doc.setDrawColor(180);
+                    doc.setLineWidth(0.2);
+                    doc.line(margin + 12, y - 5, margin + 12, y + 5);
+
+                    // Bullet & Date
+                    doc.setFontSize(9); doc.setTextColor(0, 51, 160); doc.setFont('helvetica', 'bold');
+                    const fechaSeg = new Date(seg.fecha_registro).toLocaleDateString('es-VE');
+                    doc.text(`• Seguimiento (${fechaSeg})`, margin + 18, y);
+
+                    // Observations
+                    y += 4;
+                    doc.setFontSize(9); doc.setTextColor(60); doc.setFont('helvetica', 'normal');
+                    const obsSeg = seg.observaciones || seg.estado_clinico || 'Sin detalles';
+                    const splitObs = doc.splitTextToSize(obsSeg, contentWidth - 50);
+                    doc.text(splitObs, margin + 25, y);
+
+                    y += (splitObs.length * 5) + 6;
+                });
+                y += 5;
+            } else {
+                doc.setFontSize(9); doc.setTextColor(150); doc.setFont('helvetica', 'italic');
+                doc.text('Sin seguimientos registrados para esta consulta.', margin + 20, y);
+                y += 12;
+            }
+        });
+    } else {
+        doc.setFontSize(10); doc.setTextColor(100); doc.setFont('helvetica', 'italic');
+        doc.text('No se encontraron registros de consultas para generar la estadística completa.', margin, y);
+    }
+
+    // Footer
+    const totalP = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalP; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Informe Estadístico - Página ${i} de ${totalP}`, pageWidth - 15, pageHeight - 10, { align: 'right' });
+    }
+
+    return doc.output('blob');
+}
+
 
 // ==================== FICHA INDIVIDUAL DE CONSULTA ====================
 export function generateConsultaPDF(consulta) {
@@ -541,7 +1046,7 @@ export function generateConsultaPDF(consulta) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.setTextColor(0, 51, 160); // Azul corporativo
-    doc.text('FICHA DE CONSULTA MÉDICA', pageWidth / 2, y, { align: 'center' });
+    doc.text('CONSULTA MÉDICA', pageWidth / 2, y, { align: 'center' });
     y += 6;
 
     // Código de Consulta
@@ -686,7 +1191,7 @@ export function generateConsultaPDF(consulta) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.setTextColor(255, 255, 255);
-    doc.text('PLAN DE TRATAMIENTO', margin + 2, y + 5);
+    doc.text('TRATAMIENTO', margin + 2, y + 5);
     y += 12;
 
     doc.setFont('times', 'normal');
@@ -1075,6 +1580,82 @@ export function generateDoctorPDF(doctor) {
     doc.setFontSize(7);
     doc.setTextColor(0, 51, 160);
     doc.text(`Ref: DOC-${doctor.cedula || 'N/A'}`, pageWidth / 2, footerY + 17, { align: 'center' });
+
+    return doc.output('blob');
+}
+
+// ==================== HISTORIAL DE MEDICAMENTOS UTILS ====================
+
+export function generateHistorialMedicamentosPDF({ paciente, medicamentos }) {
+    const doc = new jsPDF({ format: 'letter', unit: 'mm' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
+
+    // Header
+    try {
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = 20;
+        doc.addImage(cintillo, 'PNG', margin, y, imgWidth, imgHeight);
+        y += imgHeight + 10;
+    } catch (e) {
+        y += 20;
+    }
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 160);
+    doc.text('HISTORIAL DE MEDICAMENTOS SUMINISTRADOS', pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    // Datos Paciente
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    doc.text(`Paciente: ${paciente.nombre} ${paciente.apellido}`.toUpperCase(), margin, y);
+    doc.text(`C.I: ${paciente.cedula}`, margin + 120, y);
+    y += 10;
+
+    // Tabla
+    const columns = [
+        { header: 'Fecha', dataKey: 'fecha' },
+        { header: 'Cód. Consulta', dataKey: 'codigo' },
+        { header: 'Medicamento', dataKey: 'medicamento' },
+        { header: 'Presentación', dataKey: 'presentacion' },
+        { header: 'Cant.', dataKey: 'cantidad' },
+        { header: 'Patología', dataKey: 'enfermedad' },
+    ];
+
+    const body = medicamentos.map(m => ({
+        fecha: new Date(m.fecha).toLocaleDateString('es-VE'),
+        codigo: m.consulta_codigo || 'N/A',
+        medicamento: m.medicamento,
+        presentacion: m.presentacion || '-',
+        cantidad: m.cantidad,
+        enfermedad: m.enfermedad || '-'
+    }));
+
+    autoTable(doc, {
+        startY: y,
+        head: [columns.map(c => c.header)],
+        body: body.map(row => columns.map(c => row[c.dataKey])),
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 160], textColor: 255 },
+        styles: { fontSize: 9 },
+        margin: { left: margin, right: margin }
+    });
+
+    // Footer
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Generado el ${new Date().toLocaleDateString('es-VE')}`, margin, pageHeight - 10);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+    }
 
     return doc.output('blob');
 }

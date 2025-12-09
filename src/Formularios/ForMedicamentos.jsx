@@ -7,7 +7,6 @@ import { useToast } from "../components/userToasd";
 import SingleSelect from "../components/SingleSelect";
 import { validateField, validationRules } from "../utils/validation";
 
-// NOTA: Ajustar endpoint de categorías si difiere.
 const CATEGORIA_ENDPOINT = "medicamentos/categorias";
 
 function ForMedicamentos({ initialData = {}, onSave, onClose }) {
@@ -61,7 +60,7 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
 
   const deriveEstatus = (cant) => {
     if (cant <= 0) return "agotado";
-    if (cant < 10) return "por acabar";
+    if (cant < 10) return "existencia baja";
     return "disponible";
   };
 
@@ -163,13 +162,13 @@ function ForMedicamentos({ initialData = {}, onSave, onClose }) {
       <div className="forc-grid">
         <div className="fc-field">
           <label><span className="unique">*</span>Nombre</label>
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              placeholder="Ej: Ibuprofeno"
-              required
-            />
+          <input
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
+            placeholder="Ej: Ibuprofeno"
+            required
+          />
           {errors.nombre && <span style={{ color: "red" }}>{errors.nombre}</span>}
         </div>
 

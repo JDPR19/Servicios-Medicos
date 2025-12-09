@@ -35,7 +35,12 @@
   font-family: 'Pacifico', sans-serif;
   font-size: 1.35rem;
   color: var(--rojo-principal);
+  transition: padding 0.5s, ease-in-out ;
 }
+
+.bienvenida h1:hover{
+  padding: 0 0 10px 0;
+} 
 
 /* acciones (derecha) */
 .navigate-options {
@@ -85,10 +90,10 @@
   align-items: center;
   justify-content: center;
   padding: 12px 28px;
-  background: var(--grey-opaco, rgba(255, 255, 255, 0.92));
+  /* background: var(--grey-opaco, rgba(255, 255, 255, 0.92)); */
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(14, 30, 37, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0 10px 30px rgba(14, 30, 37, 0.06); */
+  /* border: 1px solid rgba(0, 0, 0, 0.04); */
   pointer-events: none;
   color: var(--azul-texto, #0033A0);
   font-family: 'Roboto', sans-serif;

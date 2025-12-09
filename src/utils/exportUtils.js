@@ -71,7 +71,7 @@ export function exportToPDF({
     const drawFooter = () => {
         const now = new Date();
         const dateTime = now.toLocaleString('es-VE', { dateStyle: 'short', timeStyle: 'short' });
-        const text = `Sicic-Insai — ${dateTime}`;
+        const text = `Cuidarte Yutong ${dateTime}`;
         const footFont = 8;
 
         doc.setFont('helvetica', 'normal');

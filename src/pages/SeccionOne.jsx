@@ -8,6 +8,8 @@ import Cargos from '../pages/Cargos';
 import Roles from '../pages/Roles';
 import Usuarios from '../pages/Usuarios';
 import Profesiones from '../pages/Profesiones';
+import Departamentos from "./Departamentos";
+import Finalidades from './Finalidades';
 
 
 function SeccionOne() {
@@ -18,9 +20,11 @@ function SeccionOne() {
     const t = [
       tienePermiso("doctores", "ver") && { key: "doctores", label: "Doctores" },
       tienePermiso("usuarios", "ver") && { key: "usuarios", label: "Usuarios" },
+      tienePermiso("roles", "ver") && { key: "roles", label: "Seguridad y Roles" },
       tienePermiso("cargos", "ver") && { key: "cargos", label: "Cargos" },
       tienePermiso("profesion", "ver") && { key: "profesion", label: "Profesiones" },
-      tienePermiso("roles", "ver") && { key: "roles", label: "Seguridad y Roles" },
+      tienePermiso("departamentos", "ver") && { key: "departamentos", label: "Departamentos" },
+      tienePermiso("finalidades", "ver") && { key: "finalidades", label: "finalidades" },
 
     ].filter(Boolean);
     // Si no hay tabs válidas, evita el error y muestra uno neutro
@@ -57,14 +61,18 @@ function SeccionOne() {
   let tablaRenderizada = null;
   if (activeTab === "doctores" && tabs.some(t => t.key === "doctores")) {
     tablaRenderizada = <Doctores />;
-  } else if (activeTab === "cargos" && tabs.some(t => t.key === "cargos")) {
-    tablaRenderizada = <Cargos />;
   } else if (activeTab === "roles" && tabs.some(t => t.key === "roles")) {
     tablaRenderizada = <Roles />;
   } else if (activeTab === "usuarios" && tabs.some(t => t.key === "usuarios")) {
     tablaRenderizada = <Usuarios />;
+  } else if (activeTab === "cargos" && tabs.some(t => t.key === "cargos")) {
+    tablaRenderizada = <Cargos />;
   } else if (activeTab === "profesion" && tabs.some(t => t.key === "profesion")) {
     tablaRenderizada = <Profesiones />;
+  } else if (activeTab === "departamentos" && tabs.some(t => t.key === "departamentos")) {
+    tablaRenderizada = <Departamentos />;
+  } else if (activeTab === "finalidades" && tabs.some(t => t.key === "finalidades")) {
+    tablaRenderizada = <Finalidades />;
   }
   if (activeTab === "no-access") {
     tablaRenderizada = (
